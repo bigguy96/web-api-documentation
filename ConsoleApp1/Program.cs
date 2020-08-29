@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Readers;
+﻿using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Readers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +23,42 @@ namespace ConsoleApp
             };
             var stream = await httpClient.GetStreamAsync("");
             var openApiDocument = new OpenApiStreamReader().Read(stream, out var diagnostic);
-            
+
+            var test = openApiDocument.Paths.Select(s => new
+            {
+                Endpoint = s.Key,
+                Operations = s.Value.Operations.Select(operation => new
+                {
+                    OperationType = operation.Key,
+                    Description = operation.Value.Description,
+                    Summary = operation.Value.Summary,
+                    Name = operation.Value.Tags[0].Name,
+                    RequestBody = operation.Value.RequestBody != null ? operation.Value.RequestBody.Content.Select(c => new
+                    {
+                        ContentType = c.Key,
+                        Id = c.Value.Schema?.Reference?.Id,
+                        Type = c.Value.Schema?.Type
+                    }) : null,
+                    Responses = operation.Value.Responses.Select(r => new
+                    {
+                        Name = r.Key,
+                        Description = r.Value.Description
+                    }),
+                    Parameters = operation.Value.Parameters.Select(p => new
+                    {
+                        Name = p.Name,
+                        In = p.In,
+                        Type = p.Schema.Type,
+                        Description = p.Description,
+                        IsRequired = p.Required,
+                        Enumerations = p.Schema.Enum.Select(e => new
+                        {
+                            Value = ((OpenApiPrimitive<string>)e).Value
+                        })
+                    })
+                })
+            });
+
             var paths = new List<Paths>();
             foreach (var item in openApiDocument.Paths)
             {
@@ -67,12 +103,21 @@ namespace ConsoleApp
                             Name = parameter.Name,
                             In = parameter.In,
                             Type = parameter.Schema.Type,
-                            Description = parameter.Description
-                        });    
+                            Description = parameter.Description,
+                            IsRequired = parameter.Required
+                        });
+
+                        foreach (var enu in parameter.Schema.Enum)
+                        {
+                            path.Enumerations.Add(new Enums
+                            {
+                                Value = ((OpenApiPrimitive<string>)enu).Value
+                            });
+                        }
                     }
                 }
                 paths.Add(path);
-            }       
+            }
 
             var schemas = openApiDocument.Components.Schemas.Select(x => new Schema
             {
