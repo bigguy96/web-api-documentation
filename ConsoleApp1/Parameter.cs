@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
+using System.Collections.Generic;
 
 namespace ConsoleApp
 {
@@ -9,5 +10,6 @@ namespace ConsoleApp
         public string Type { get; set; }
         public string Description { get; set; }
         public bool IsRequired { get; internal set; }
+        public IEnumerable<Enums> Enumerations { get; set; }
     }
 }

@@ -21,102 +21,72 @@ namespace ConsoleApp
             {
                 BaseAddress = new Uri("https://raw.githubusercontent.com/OAI/OpenAPI-Specification/")
             };
-            var stream = await httpClient.GetStreamAsync("");
+            var stream = await httpClient.GetStreamAsync("https://wwwapps.tc.gc.ca/Saf-Sec-Sur/13/mtapi/swagger/docs/v1");
             var openApiDocument = new OpenApiStreamReader().Read(stream, out var diagnostic);
-
-            var test = openApiDocument.Paths.Select(s => new
+            var paths = openApiDocument.Paths.Select(s => new Paths
             {
                 Endpoint = s.Key,
-                Operations = s.Value.Operations.Select(operation => new
+                Operations = s.Value.Operations.Select(operation => new Operation
                 {
                     OperationType = operation.Key,
                     Description = operation.Value.Description,
                     Summary = operation.Value.Summary,
                     Name = operation.Value.Tags[0].Name,
-                    RequestBody = operation.Value.RequestBody != null ? operation.Value.RequestBody.Content.Select(c => new
+                    RequestBodies = operation.Value.RequestBody != null ? operation.Value.RequestBody.Content.Select(c => new RequestBody
                     {
                         ContentType = c.Key,
                         Id = c.Value.Schema?.Reference?.Id,
                         Type = c.Value.Schema?.Type
-                    }) : null,
-                    Responses = operation.Value.Responses.Select(r => new
+                    }) : new List<RequestBody>(),
+                    Responses = operation.Value.Responses.Select(r => new Response
                     {
                         Name = r.Key,
                         Description = r.Value.Description
                     }),
-                    Parameters = operation.Value.Parameters.Select(p => new
+                    Parameters = operation.Value.Parameters.Select(p => new Parameter
                     {
                         Name = p.Name,
                         In = p.In,
                         Type = p.Schema.Type,
                         Description = p.Description,
                         IsRequired = p.Required,
-                        Enumerations = p.Schema.Enum.Select(e => new
+                        Enumerations = p.Schema.Enum.Select(e => new Enums
                         {
                             Value = ((OpenApiPrimitive<string>)e).Value
                         })
                     })
                 })
-            });
+            }).ToList();
 
-            var paths = new List<Paths>();
+            //var paths = new List<Paths>();
             foreach (var item in openApiDocument.Paths)
             {
                 var path = new Paths { Endpoint = item.Key };
 
                 foreach (var operation in item.Value.Operations)
                 {
-                    path.Operations.Add(new Operation
-                    {
-                        OperationType = operation.Key,
-                        Description = operation.Value.Description,
-                        Summary = operation.Value.Summary,
-                        Name = operation.Value.Tags[0].Name
-                    });
-
                     if (operation.Value.RequestBody != null)
                     {
                         foreach (var requestBody in operation.Value.RequestBody.Content)
                         {
-                            path.RequestBodies.Add(new RequestBody
-                            {
-                                ContentType = requestBody.Key,
-                                Id = requestBody.Value.Schema?.Reference?.Id,
-                                Type = requestBody.Value.Schema?.Type
-                            });
+                           
                         }
                     }
 
                     foreach (var response in operation.Value.Responses)
                     {
-                        path.Responses.Add(new Response
-                        {
-                            Name = response.Key,
-                            Description = response.Value.Description
-                        });
+                        
                     }
 
                     foreach (var parameter in operation.Value.Parameters)
                     {
-                        path.Parameters.Add(new Parameter
-                        {
-                            Name = parameter.Name,
-                            In = parameter.In,
-                            Type = parameter.Schema.Type,
-                            Description = parameter.Description,
-                            IsRequired = parameter.Required
-                        });
-
                         foreach (var enu in parameter.Schema.Enum)
                         {
-                            path.Enumerations.Add(new Enums
-                            {
-                                Value = ((OpenApiPrimitive<string>)enu).Value
-                            });
+                            
                         }
                     }
                 }
-                paths.Add(path);
+                //paths.Add(path);
             }
 
             var schemas = openApiDocument.Components.Schemas.Select(x => new Schema
