@@ -23,6 +23,11 @@ namespace ConsoleApp
             };
             var stream = await httpClient.GetStreamAsync("https://wwwapps.tc.gc.ca/Saf-Sec-Sur/13/mtapi/swagger/docs/v1");
             var openApiDocument = new OpenApiStreamReader().Read(stream, out var diagnostic);
+
+            var content = await File.ReadAllTextAsync(template);
+            html.AppendLine(content);
+
+            //get all endpoint infomartion.
             var paths = openApiDocument.Paths.Select(s => new Paths
             {
                 Endpoint = s.Key,
@@ -58,37 +63,54 @@ namespace ConsoleApp
                 })
             }).ToList();
 
-            //var paths = new List<Paths>();
-            foreach (var item in openApiDocument.Paths)
+            //add endpoint details to html.
+            foreach (var path in paths)
             {
-                var path = new Paths { Endpoint = item.Key };
+                html.AppendLine($"<h2>{path.Endpoint}</h2>");
+                html.AppendLine("<div>");
 
-                foreach (var operation in item.Value.Operations)
+                foreach (var operation in path.Operations)
                 {
-                    if (operation.Value.RequestBody != null)
-                    {
-                        foreach (var requestBody in operation.Value.RequestBody.Content)
-                        {
-                           
-                        }
-                    }
+                    html.AppendLine("<h3>Operations</h3>");
+                    html.AppendLine($"<p>{operation.Name}</p>");
+                    html.AppendLine($"<p>{operation.OperationType}</p>");
+                    html.AppendLine($"<p>{operation.Description}</p>");
+                    html.AppendLine($"<p>{operation.Summary}</p>");
 
-                    foreach (var response in operation.Value.Responses)
+                    html.AppendLine("<hr />");
+
+                    foreach (var response in operation.Responses)
                     {
+                        html.AppendLine("<h3>Responses</h3>");
+                        html.AppendLine($"<p>{response.Name}</p>");
+                        html.AppendLine($"<p>{response.Description}</p>");
+                    }
+                    html.AppendLine("<hr />");
+
+                    foreach (var parameter in operation.Parameters)
+                    {
+                        html.AppendLine("<h3>Parameters</h3>");
+                        html.AppendLine($"<p>{parameter.Name}</p>");
+                        html.AppendLine($"<p>{parameter.Type}</p>");
+                        html.AppendLine($"<p>{parameter.In}</p>");
+                        html.AppendLine($"<p>{parameter.Description}</p>");
+                        html.AppendLine($"<p>{parameter.IsRequired}</p>");
+
+                        if (parameter.Enumerations.Any())
+                        {
+                            html.AppendLine("<h4>Enums</h4>");
+                            html.AppendLine($"<p>{string.Join(" ,", parameter.Enumerations.Select(e => e.Value))}</p>");
+                        }
                         
+                        html.AppendLine("<hr />");
                     }
-
-                    foreach (var parameter in operation.Value.Parameters)
-                    {
-                        foreach (var enu in parameter.Schema.Enum)
-                        {
-                            
-                        }
-                    }
+                    html.AppendLine("<hr />");
                 }
-                //paths.Add(path);
+
+                html.AppendLine("</div>");
             }
 
+            //get schema information.
             var schemas = openApiDocument.Components.Schemas.Select(x => new Schema
             {
                 Name = x.Key,
@@ -96,12 +118,10 @@ namespace ConsoleApp
                 {
                     Name = y.Key,
                     Type = $"{char.ToUpper(y.Value.Type[0])}{y.Value.Type.Substring(1)}"
-                }).ToList()
-            }).OrderBy(o => o.Name);
+                })
+            }).OrderBy(o => o.Name);           
 
-            var content = await File.ReadAllTextAsync(template);
-            html.Append(content);
-
+            //add endpoint details to html.
             foreach (var item in schemas)
             {
                 html.AppendLine($"<h2>{item.Name}</h2>");
@@ -128,8 +148,39 @@ namespace ConsoleApp
 
             html.AppendLine("</body>");
             html.AppendLine("</html>");
+            
+            await File.WriteAllTextAsync(Path.Combine(mydocs, "template", "schemas.html"), html.ToString());
 
-            //await File.WriteAllTextAsync(Path.Combine(mydocs, "template", "schemas.html"), html.ToString());
+            //var paths = new List<Paths>();
+            //foreach (var item in openApiDocument.Paths)
+            //{
+            //    var path = new Paths { Endpoint = item.Key };
+
+            //    foreach (var operation in item.Value.Operations)
+            //    {
+            //        if (operation.Value.RequestBody != null)
+            //        {
+            //            foreach (var requestBody in operation.Value.RequestBody.Content)
+            //            {
+
+            //            }
+            //        }
+
+            //        foreach (var response in operation.Value.Responses)
+            //        {
+
+            //        }
+
+            //        foreach (var parameter in operation.Value.Parameters)
+            //        {
+            //            foreach (var enu in parameter.Schema.Enum)
+            //            {
+
+            //            }
+            //        }
+            //    }
+            //    //paths.Add(path);
+            //}
 
             Console.WriteLine("Done!");
             Console.ReadLine();
