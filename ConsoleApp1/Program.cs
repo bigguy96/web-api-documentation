@@ -23,6 +23,8 @@ namespace ConsoleApp
             };
             var stream = await httpClient.GetStreamAsync("https://wwwapps.tc.gc.ca/Saf-Sec-Sur/13/mtapi/swagger/docs/v1");
             var openApiDocument = new OpenApiStreamReader().Read(stream, out var diagnostic);
+            var apiInformation = $"{ openApiDocument.Info.Title} {openApiDocument.Info.Version}";
+            var server = openApiDocument.Servers.FirstOrDefault().Url;
 
             var content = await File.ReadAllTextAsync(template);
             html.AppendLine(content);
@@ -99,7 +101,7 @@ namespace ConsoleApp
                         if (parameter.Enumerations.Any())
                         {
                             html.AppendLine("<h4>Enums</h4>");
-                            html.AppendLine($"<p>{string.Join(" ,", parameter.Enumerations.Select(e => e.Value))}</p>");
+                            html.AppendLine($"<p>{string.Join(", ", parameter.Enumerations.Select(e => e.Value))}</p>");
                         }
                         
                         html.AppendLine("<hr />");
@@ -117,7 +119,11 @@ namespace ConsoleApp
                 Properties = x.Value.Properties.Select(y => new Properties
                 {
                     Name = y.Key,
-                    Type = $"{char.ToUpper(y.Value.Type[0])}{y.Value.Type.Substring(1)}"
+                    Type = $"{char.ToUpper(y.Value.Type[0])}{y.Value.Type.Substring(1)}",
+                    Enumerations = y.Value.Enum.Select(e => new Enums
+                    {
+                        Value = ((OpenApiPrimitive<string>)e).Value
+                    })
                 })
             }).OrderBy(o => o.Name);           
 
@@ -140,6 +146,14 @@ namespace ConsoleApp
                     html.AppendLine($"<td>{prop.Name}</td>");
                     html.AppendLine($"<td>{prop.Type}</td>");
                     html.AppendLine("</tr>");
+
+                    if (prop.Enumerations.Any())
+                    {
+                        html.AppendLine("<tr>");                        
+                        html.AppendLine($"<td>{string.Join(", ", prop.Enumerations.Select(e => e.Value))}</td>");
+                        html.AppendLine("<td>String</td>");
+                        html.AppendLine("</tr>");
+                    }
                 }
 
                 html.AppendLine("</tbody>");

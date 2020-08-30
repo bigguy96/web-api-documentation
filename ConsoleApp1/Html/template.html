@@ -1,12 +1,14 @@
 ﻿<!doctype html>
 <html lang="en">
+
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <style>
         body {
             margin: 15px;
@@ -20,10 +22,67 @@
             position: fixed !important;
         }
 
-        th, td {
+        th,
+        td {
             width: 50%;
         }
     </style>
     <title>template</title>
 </head>
+
 <body>
+    <h1>Sample API Documentation</h1>
+    <h2>Introduction</h2>
+    <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+        magna aliqua. Nunc mi ipsum faucibus vitae. Sit amet volutpat consequat mauris nunc congue nisi.
+    </p>
+
+    <h2>Requests</h2>
+    <p>
+        The {XYZ} Web API is based on <a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a>
+        principles. Data resources are accessed via standard HTTPS requests in UTF-8 format to an API endpoint. Where
+        possible, Web API uses appropriate HTTP verbs for each action:
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Method</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>GET</td>
+                <td>Retrieves resources</td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>Creates resources</td>
+            </tr>
+            <tr>
+                <td>PUT</td>
+                <td>Changes and/or replaces resources or collections</td>
+            </tr>
+            <tr>
+                <td>DELETE</td>
+                <td>Deletes resources</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Description Of Server Responses:</h2>
+    <ul>
+        <li>200 <code>OK</code> - the request was successful (some API calls may return 201 instead).</li>
+        <li>201 <code>Created</code> - the request was successful and a resource was created.</li>
+        <li>204 <code>No Content</code> - the request was successful but there is no representation to return (i.e. the response is empty).</li>
+        <li>400 <code>Bad Request</code> - the request could not be understood or was missing required parameters.</li>
+        <li>401 <code>Unauthorized</code> - authentication failed or user doesn't have permissions for requested operation.</li>
+        <li>403 <code>Forbidden</code> - access denied.</li>
+        <li>404 <code>Not Found</code> - resource was not found.</li>
+        <li>405 <code>Method Not Allowed</code> - requested method is not supported for resource.</li>
+    </ul>
+    <h2>Authentication</h2>
+    <p>All requests to Web API require authentication. This is achieved by sending a valid OAuth access token in the request header. For more information about these authentication methods, see the <a href="#">Web API Authorization Guide</a>.</p>
+
