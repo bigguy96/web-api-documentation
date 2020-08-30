@@ -35,7 +35,7 @@ namespace ConsoleApp
                 Endpoint = s.Key,
                 Operations = s.Value.Operations.Select(operation => new Operation
                 {
-                    OperationType = operation.Key,
+                    OperationType = $"{operation.Key} - {s.Key}",
                     Description = operation.Value.Description,
                     Summary = operation.Value.Summary,
                     Name = operation.Value.Tags[0].Name,
@@ -65,52 +65,164 @@ namespace ConsoleApp
                 })
             }).ToList();
 
-            //add endpoint details to html.
-            foreach (var path in paths)
+            var g = paths.Select(s =>s.Operations.GroupBy(gb => gb.Name));
+
+            //var n = openApiDocument.Paths.Select(c => new { more= c.Value.Operations.Count > 1, ep = c.Key, w = c.Value.Operations }).Where(w=> w.more).ToList();
+
+            //var t = paths.Select(s => new
+            //{
+            //    Endpoint = s.Operations.Select(ss => new { Endpoint = $"{ss.OperationType} - {s.Endpoint}", ss.Description, ss.Summary, ss.Name }),
+            //    ContentTypes = s.Operations.Select(r => new { ContentType = r.RequestBodies.Select(rb => new { rb.ContentType }) }),
+            //    Responses = s.Operations.Select(r => new { ContentType = r.Responses.Select(rb => new { rb.Name, rb.Description }) }),
+            //    Parameters = s.Operations.Select(r => new { Parameters = r.Parameters.Select(pa => new { pa.Name, pa.In, pa.Type, pa.Description, pa.IsRequired, pa.Enumerations }) })
+            //}).ToList();
+
+            foreach (var item in g)
             {
-                html.AppendLine($"<h2>{path.Endpoint}</h2>");
-                html.AppendLine("<div>");
-
-                foreach (var operation in path.Operations)
+                foreach (var i in item)
                 {
-                    html.AppendLine("<h3>Operations</h3>");
-                    html.AppendLine($"<p>{operation.Name}</p>");
-                    html.AppendLine($"<p>{operation.OperationType}</p>");
-                    html.AppendLine($"<p>{operation.Description}</p>");
-                    html.AppendLine($"<p>{operation.Summary}</p>");
+                    var a = i.Key;
+                    html.AppendLine($"<h1>{i.Key}</h1>");
 
-                    html.AppendLine("<hr />");
-
-                    foreach (var response in operation.Responses)
+                    foreach (var ii in i)
                     {
-                        html.AppendLine("<h3>Responses</h3>");
-                        html.AppendLine($"<p>{response.Name}</p>");
-                        html.AppendLine($"<p>{response.Description}</p>");
-                    }
-                    html.AppendLine("<hr />");
+                        html.AppendLine(@"<div class=""card border-dark"">");
+                        html.AppendLine($@"<div class=""card-header""><h2 class=""bg-light"">{ii.OperationType}</h2></div>");
+                        html.AppendLine(@"<div class=""card-body"">");
+                        html.AppendLine("<h3>Description</h3>");
+                        html.AppendLine($"<p>{ii.Description}</p>");
+                        html.AppendLine("<h3>Summary</h3>");
+                        html.AppendLine($"<p>{ii.Summary}</p>");
 
-                    foreach (var parameter in operation.Parameters)
-                    {
-                        html.AppendLine("<h3>Parameters</h3>");
-                        html.AppendLine($"<p>{parameter.Name}</p>");
-                        html.AppendLine($"<p>{parameter.Type}</p>");
-                        html.AppendLine($"<p>{parameter.In}</p>");
-                        html.AppendLine($"<p>{parameter.Description}</p>");
-                        html.AppendLine($"<p>{parameter.IsRequired}</p>");
+                        html.AppendLine("<h4>Response Content Type</h4>");
+                        html.AppendLine(@"<table class=""table table-bordered table-hover"">");
+                        html.AppendLine(@"<thead class=""thead-dark"">");
+                        html.AppendLine("<tr>");
+                        html.AppendLine(@"<th scope=""col"">Content Type</th>");
+                        html.AppendLine(@"<th scope=""col"">Id</th>");
+                        html.AppendLine(@"<th scope=""col"">Type</th>");                        
+                        html.AppendLine("</tr>");
+                        html.AppendLine("</thead>");
+                        html.AppendLine("<tbody>");
 
-                        if (parameter.Enumerations.Any())
+                        foreach (var aa in ii.RequestBodies)
                         {
-                            html.AppendLine("<h4>Enums</h4>");
-                            html.AppendLine($"<p>{string.Join(", ", parameter.Enumerations.Select(e => e.Value))}</p>");
+                            html.AppendLine("<tr>");
+                            html.AppendLine($"<td>{aa.ContentType}</td>");
+                            html.AppendLine($"<td>{aa.Id}</td>");
+                            html.AppendLine($"<td>{aa.Type}</td>");
+                            html.AppendLine("</tr>");
                         }
-                        
-                        html.AppendLine("<hr />");
-                    }
-                    html.AppendLine("<hr />");
-                }
 
-                html.AppendLine("</div>");
+                        html.AppendLine("</tbody>");
+                        html.AppendLine("</table>");
+
+                        html.AppendLine("<h4>Responses</h4>");
+                        html.AppendLine(@"<table class=""table table-bordered table-hover"">");
+                        html.AppendLine(@"<thead class=""thead-dark"">");
+                        html.AppendLine("<tr>");
+                        html.AppendLine(@"<th scope=""col"">Name</th>");
+                        html.AppendLine(@"<th scope=""col"">Description</th>");                        
+                        html.AppendLine("</tr>");
+                        html.AppendLine("</thead>");
+                        html.AppendLine("<tbody>");
+
+                        foreach (var bb in ii.Responses)
+                        {
+                            html.AppendLine("<tr>");
+                            html.AppendLine($"<td>{bb.Name}</td>");
+                            html.AppendLine($"<td>{bb.Description}</td>");
+                            html.AppendLine("</tr>");
+                        }
+
+                        html.AppendLine("</tbody>");
+                        html.AppendLine("</table>");
+
+                        html.AppendLine("<h4>Parameters</h4>");
+                        html.AppendLine(@"<table class=""table table-bordered table-hover"">");
+                        html.AppendLine(@"<thead class=""thead-dark"">");
+                        html.AppendLine("<tr>");
+                        html.AppendLine(@"<th scope=""col"">Name</th>");
+                        html.AppendLine(@"<th scope=""col"">In</th>");
+                        html.AppendLine(@"<th scope=""col"">Type</th>");
+                        html.AppendLine(@"<th scope=""col"">Description</th>");
+                        html.AppendLine(@"<th scope=""col"">IsRequired</th>");
+                        html.AppendLine(@"<th scope=""col"">Enums</th>");
+                        html.AppendLine("</tr>");
+                        html.AppendLine("</thead>");
+                        html.AppendLine("<tbody>");
+
+                        foreach (var cc in ii.Parameters)
+                        {
+                            html.AppendLine("<tr>");
+                            html.AppendLine($"<td>{cc.Name}</td>");
+                            html.AppendLine($"<td>{cc.In}</td>");
+                            html.AppendLine($"<td>{cc.Type}</td>");
+                            html.AppendLine($"<td>{cc.Description}</td>");
+                            html.AppendLine($"<td>{cc.IsRequired}</td>");
+                            html.AppendLine($"<td>{string.Join(", ", cc.Enumerations.Select(e => e.Value))}</td>");
+                            html.AppendLine("</tr>");
+                        }
+
+                        html.AppendLine("</tbody>");
+                        html.AppendLine("</table>");
+
+                        html.AppendLine("</div>");
+                        html.AppendLine("</div>");
+                    }
+
+                }
             }
+
+            //add endpoint details to html.
+            //foreach (var path in paths)
+            //{
+            //    //html.AppendLine($"<h2>{path.Endpoint}</h2>");
+            //    html.AppendLine(@"<div class=""card border-dark"">");
+            //    html.AppendLine($@"<div class=""card-header""><h2 class=""bg-light"">{path.Endpoint}</h2></div>");
+            //    html.AppendLine(@"<div class=""card-body"">");
+
+            //    foreach (var operation in path.Operations)
+            //    {
+            //        html.AppendLine("<h3>Operations</h3>");
+            //        html.AppendLine($"<p>{operation.Name}</p>");
+            //        html.AppendLine($"<p>{operation.OperationType}</p>");
+            //        html.AppendLine($"<p>{operation.Description}</p>");
+            //        html.AppendLine($"<p>{operation.Summary}</p>");
+
+            //        html.AppendLine("<hr />");
+
+            //        foreach (var response in operation.Responses)
+            //        {
+            //            html.AppendLine("<h3>Responses</h3>");
+            //            html.AppendLine($"<p>{response.Name}</p>");
+            //            html.AppendLine($"<p>{response.Description}</p>");
+            //        }
+            //        html.AppendLine("<hr />");
+
+            //        foreach (var parameter in operation.Parameters)
+            //        {
+            //            html.AppendLine("<h3>Parameters</h3>");
+            //            html.AppendLine($"<p>{parameter.Name}</p>");
+            //            html.AppendLine($"<p>{parameter.Type}</p>");
+            //            html.AppendLine($"<p>{parameter.In}</p>");
+            //            html.AppendLine($"<p>{parameter.Description}</p>");
+            //            html.AppendLine($"<p>{parameter.IsRequired}</p>");
+
+            //            if (parameter.Enumerations.Any())
+            //            {
+            //                html.AppendLine("<h4>Enums</h4>");
+            //                html.AppendLine($"<p>{string.Join(", ", parameter.Enumerations.Select(e => e.Value))}</p>");
+            //            }
+
+            //            html.AppendLine("<hr />");
+            //        }
+            //        html.AppendLine("<hr />");
+            //    }
+
+            //    html.AppendLine("</div>");
+            //    html.AppendLine("</div>");
+            //}
 
             //get schema information.
             var schemas = openApiDocument.Components.Schemas.Select(x => new Schema
@@ -125,7 +237,7 @@ namespace ConsoleApp
                         Value = ((OpenApiPrimitive<string>)e).Value
                     })
                 })
-            }).OrderBy(o => o.Name);           
+            }).OrderBy(o => o.Name);
 
             //add endpoint details to html.
             foreach (var item in schemas)
@@ -149,7 +261,7 @@ namespace ConsoleApp
 
                     if (prop.Enumerations.Any())
                     {
-                        html.AppendLine("<tr>");                        
+                        html.AppendLine("<tr>");
                         html.AppendLine($"<td>{string.Join(", ", prop.Enumerations.Select(e => e.Value))}</td>");
                         html.AppendLine("<td>String</td>");
                         html.AppendLine("</tr>");
@@ -162,7 +274,7 @@ namespace ConsoleApp
 
             html.AppendLine("</body>");
             html.AppendLine("</html>");
-            
+
             await File.WriteAllTextAsync(Path.Combine(mydocs, "template", "schemas.html"), html.ToString());
 
             //var paths = new List<Paths>();
