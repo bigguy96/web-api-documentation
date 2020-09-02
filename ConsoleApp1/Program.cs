@@ -10,32 +10,35 @@ using System.Text;
 
 namespace ConsoleApp
 {
-    class Program
+    internal class Program
     {
+        private const string RequestUri = "https://wwwapps.tc.gc.ca/Saf-Sec-Sur/13/mtapi/swagger/docs/v1";
         private static OpenApiDocument _openApiDocument;
+        private static readonly List<string> Properties = new List<string>();
 
-        static async System.Threading.Tasks.Task Main(string[] args)
+        private static async System.Threading.Tasks.Task Main()
         {
             var html = new StringBuilder("");
-            var mydocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var template = Path.Combine(mydocs, "template", "template.html");
+            var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var template = Path.Combine(myDocuments, "template", "template.html");
+            var content = await File.ReadAllTextAsync(template);
 
             var httpClient = new HttpClient
             {
                 BaseAddress = new Uri("https://raw.githubusercontent.com/OAI/OpenAPI-Specification/")
             };
-            var stream = await httpClient.GetStreamAsync("https://wwwapps.tc.gc.ca/Saf-Sec-Sur/13/mtapi/swagger/docs/v1");
-            var openApiDocument = new OpenApiStreamReader().Read(stream, out var diagnostic);
-            var apiInformation = $"{ openApiDocument.Info.Title} {openApiDocument.Info.Version}";
-            var server = openApiDocument.Servers.FirstOrDefault().Url;
+            var stream = await httpClient.GetStreamAsync(RequestUri);
+            _openApiDocument = new OpenApiStreamReader().Read(stream, out _);
+            var apiInformation = $"{ _openApiDocument.Info.Title} {_openApiDocument.Info.Version}";
+            var server = _openApiDocument.Servers.FirstOrDefault()?.Url;
 
-            _openApiDocument = openApiDocument;
-
-            var content = await File.ReadAllTextAsync(template);
+            
             html.AppendLine(content);
+            html.AppendLine($"<h1>{apiInformation}</h1>");
+            html.AppendLine($"<p><strong>{server}</strong></p>");
 
-            //get all endpoint infomartion.
-            var paths = openApiDocument.Paths.Select(s => new Paths
+            //get all endpoint information.
+            var paths = _openApiDocument.Paths.Select(s => new Paths
             {
                 Endpoint = s.Key,
                 Operations = s.Value.Operations.Select(operation => new Operation
@@ -173,21 +176,21 @@ namespace ConsoleApp
             }
 
             //get schema information.
-            var schemas = openApiDocument.Components.Schemas.Select(x => new Schema
+            var schemas = _openApiDocument.Components.Schemas.Select(keyValuePair => new Schema
             {
-                Name = x.Key,
-                Properties = x.Value.Properties.Select(y => new Properties
+                Name = keyValuePair.Key,
+                Properties = keyValuePair.Value.Properties.Select(valuePair => new Properties
                 {
-                    Name = y.Key,
-                    Type = $"{char.ToUpper(y.Value.Type[0])}{y.Value.Type.Substring(1)}",
-                    Enumerations = y.Value.Enum.Select(e => new Enums
+                    Name = valuePair.Key,
+                    Type = $"{char.ToUpper(valuePair.Value.Type[0])}{valuePair.Value.Type.Substring(1)}",
+                    Enumerations = valuePair.Value.Enum.Select(e => new Enums
                     {
                         Value = ((OpenApiPrimitive<string>)e).Value
                     })
                 })
-            }).OrderBy(o => o.Name);
+            }).OrderBy(schema => schema.Name);
 
-            var f = openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals("UserRegistrationContext"));
+            var f = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals("UserRegistrationContext"));
             var ds = GetProperties(f);
 
             //add endpoint details to html.
@@ -210,13 +213,12 @@ namespace ConsoleApp
                     html.AppendLine($"<td>{prop.Type}</td>");
                     html.AppendLine("</tr>");
 
-                    if (prop.Enumerations.Any())
-                    {
-                        html.AppendLine("<tr>");
-                        html.AppendLine($"<td>{string.Join(", ", prop.Enumerations.Select(e => e.Value))}</td>");
-                        html.AppendLine("<td>String</td>");
-                        html.AppendLine("</tr>");
-                    }
+                    if (!prop.Enumerations.Any()) continue;
+
+                    html.AppendLine("<tr>");
+                    html.AppendLine($"<td>{string.Join(", ", prop.Enumerations.Select(e => e.Value))}</td>");
+                    html.AppendLine("<td>String</td>");
+                    html.AppendLine("</tr>");
                 }
 
                 html.AppendLine("</tbody>");
@@ -226,27 +228,25 @@ namespace ConsoleApp
             html.AppendLine("</body>");
             html.AppendLine("</html>");
 
-            await File.WriteAllTextAsync(Path.Combine(mydocs, "template", "schemas.html"), html.ToString());
+            await File.WriteAllTextAsync(Path.Combine(myDocuments, "template", "schemas.html"), html.ToString());
 
             Console.WriteLine("Done!");
             Console.ReadLine();
         }
 
-        private static List<string> _properties = new List<string>();
         private static IEnumerable<string> GetProperties(KeyValuePair<string, OpenApiSchema> kvp)
         {
-            foreach (var prop in kvp.Value.Properties)
+            foreach (var (key, openApiSchema) in kvp.Value.Properties)
             {
-                _properties.Add($"{prop.Key};{prop.Value.Type}");
+                Properties.Add($"{key};{openApiSchema.Type}");
 
-                if (prop.Value.Reference != null)
-                {
-                    var schema = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(prop.Value.Reference.Id));
-                    GetProperties(schema);
-                }
+                if (openApiSchema.Reference == null) continue;
+
+                var schema = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(openApiSchema.Reference.Id));
+                GetProperties(schema);
             }
 
-            return _properties;
+            return Properties;
         }
     }
 }
