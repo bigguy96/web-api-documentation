@@ -3,7 +3,6 @@ using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -29,7 +28,6 @@ namespace ConsoleApp
             var openApiDocument = new OpenApiStreamReader().Read(stream, out var diagnostic);
             var apiInformation = $"{ openApiDocument.Info.Title} {openApiDocument.Info.Version}";
             var server = openApiDocument.Servers.FirstOrDefault().Url;
-
 
             _openApiDocument = openApiDocument;
 
@@ -72,48 +70,50 @@ namespace ConsoleApp
                 })
             }).ToList();
 
-            var g = paths.Select(s => s.Operations.GroupBy(gb => gb.Name));
+            var pathGroupings = paths.Select(s => s.Operations.GroupBy(gb => gb.Name));
 
-            foreach (var item in g)
+            foreach (var path in pathGroupings)
             {
-                foreach (var i in item)
+                foreach (var group in path)
                 {
-                    html.AppendLine($"<h1>{i.Key}</h1>");
+                    html.AppendLine($"<h1>{group.Key}</h1>");
 
-                    foreach (var ii in i)
+                    foreach (var operation in group)
                     {
                         html.AppendLine(@"<div class=""card border-dark"">");
-                        html.AppendLine($@"<div class=""card-header""><h2 class=""bg-light"">{ii.OperationType}</h2></div>");
+                        html.AppendLine($@"<div class=""card-header""><h2 class=""bg-light"">{operation.OperationType}</h2></div>");
                         html.AppendLine(@"<div class=""card-body"">");
                         html.AppendLine("<h3>Description</h3>");
-                        html.AppendLine($"<p>{ii.Description}</p>");
+                        html.AppendLine($"<p>{operation.Description}</p>");
                         html.AppendLine("<h3>Summary</h3>");
-                        html.AppendLine($"<p>{ii.Summary}</p>");
-
+                        html.AppendLine($"<p>{operation.Summary}</p>");
+                        
                         html.AppendLine("<h4>Response Content Type</h4>");
-                        html.AppendLine(@"<table class=""table table-bordered table-hover"">");
-                        html.AppendLine(@"<thead class=""thead-dark"">");
-                        html.AppendLine("<tr>");
-                        html.AppendLine(@"<th scope=""col"">Content Type</th>");
-                        html.AppendLine(@"<th scope=""col"">Id</th>");
-                        html.AppendLine(@"<th scope=""col"">Type</th>");
-                        html.AppendLine("</tr>");
-                        html.AppendLine("</thead>");
-                        html.AppendLine("<tbody>");
-
-                        foreach (var aa in ii.RequestBodies)
-                        {
+                        if (operation.RequestBodies.Any())
+                        {                            
+                            html.AppendLine(@"<table class=""table table-bordered table-hover"">");
+                            html.AppendLine(@"<thead class=""thead-dark"">");
                             html.AppendLine("<tr>");
-                            html.AppendLine($"<td>{aa.ContentType}</td>");
-                            html.AppendLine($"<td>{aa.Id}</td>");
-                            html.AppendLine($"<td>{aa.Type}</td>");
+                            html.AppendLine(@"<th scope=""col"">Content Type</th>");
+                            html.AppendLine(@"<th scope=""col"">Id</th>");
+                            html.AppendLine(@"<th scope=""col"">Type</th>");
                             html.AppendLine("</tr>");
+                            html.AppendLine("</thead>");
+                            html.AppendLine("<tbody>");
 
-                            //var z = openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(aa.Id));
+                            var contentType = operation.RequestBodies?.SingleOrDefault(requestBody => requestBody.ContentType.Equals("application/json"));                            
+                            html.AppendLine("<tr>");
+                            html.AppendLine($"<td>{contentType?.ContentType}</td>");
+                            html.AppendLine($"<td>{contentType?.Id}</td>");
+                            html.AppendLine($"<td>{contentType?.Type}</td>");
+                            html.AppendLine("</tr>");
+                            html.AppendLine("</tbody>");
+                            html.AppendLine("</table>");
                         }
-
-                        html.AppendLine("</tbody>");
-                        html.AppendLine("</table>");
+                        else
+                        {
+                            html.AppendLine("<p>application/json</p>");
+                        }
 
                         html.AppendLine("<h4>Responses</h4>");
                         html.AppendLine(@"<table class=""table table-bordered table-hover"">");
@@ -125,11 +125,11 @@ namespace ConsoleApp
                         html.AppendLine("</thead>");
                         html.AppendLine("<tbody>");
 
-                        foreach (var bb in ii.Responses)
+                        foreach (var response in operation.Responses)
                         {
                             html.AppendLine("<tr>");
-                            html.AppendLine($"<td>{bb.Name}</td>");
-                            html.AppendLine($"<td>{bb.Description}</td>");
+                            html.AppendLine($"<td>{response.Name}</td>");
+                            html.AppendLine($"<td>{response.Description}</td>");
                             html.AppendLine("</tr>");
                         }
 
@@ -150,15 +150,15 @@ namespace ConsoleApp
                         html.AppendLine("</thead>");
                         html.AppendLine("<tbody>");
 
-                        foreach (var cc in ii.Parameters)
+                        foreach (var parameter in operation.Parameters)
                         {
                             html.AppendLine("<tr>");
-                            html.AppendLine($"<td>{cc.Name}</td>");
-                            html.AppendLine($"<td>{cc.In}</td>");
-                            html.AppendLine($"<td>{cc.Type}</td>");
-                            html.AppendLine($"<td>{cc.Description}</td>");
-                            html.AppendLine($"<td>{cc.IsRequired}</td>");
-                            html.AppendLine($"<td>{string.Join(", ", cc.Enumerations.Select(e => e.Value))}</td>");
+                            html.AppendLine($"<td>{parameter.Name}</td>");
+                            html.AppendLine($"<td>{parameter.In}</td>");
+                            html.AppendLine($"<td>{parameter.Type}</td>");
+                            html.AppendLine($"<td>{parameter.Description}</td>");
+                            html.AppendLine($"<td>{parameter.IsRequired}</td>");
+                            html.AppendLine($"<td>{string.Join(", ", parameter.Enumerations.Select(e => e.Value))}</td>");
                             html.AppendLine("</tr>");
                         }
 
@@ -187,49 +187,13 @@ namespace ConsoleApp
                 })
             }).OrderBy(o => o.Name);
 
-            var f = openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals("UserActivationContext"));
-            //var n = f.Value.Properties.SelectMany(sm=> GetNodeAndDescendants(sm));
-
-
-            var ds = DoStuff(f);
-
-            //var bbb = f.Value.Properties.Select(s => new
-            //{
-            //    r = $"{s.Key};{s.Value.Type}",
-            //    d = s.Value.Properties.Select(sm => new
-            //    {
-            //        sm.Key,
-            //        sm.Value,
-            //        props = s.Value.Properties
-            //    })
-            //});
-
-
-            var list = new List<string>();
-            foreach (var item in f.Value.Properties)
-            {
-                var t = item.Key;
-                var w = item.Value.Type;
-
-                if (item.Value.Reference != null)
-                {
-                    var df = openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(item.Value.Reference.Id));
-                    //var tt = df.Value.Properties.SelectMany(sm => sm.Value.Properties);
-                    foreach (var pp in df.Value.Properties)
-                    {
-                        var tt = pp.Key;
-                        var ww = pp.Value.Type;
-                    }
-
-                }
-                //list.AddRange(DoStuff(item));
-
-            }
+            var f = openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals("UserRegistrationContext"));
+            var ds = GetProperties(f);
 
             //add endpoint details to html.
-            foreach (var item in schemas)
+            foreach (var schema in schemas)
             {
-                html.AppendLine($"<h2>{item.Name}</h2>");
+                html.AppendLine($"<h2>{schema.Name}</h2>");
                 html.AppendLine(@"<table class=""table table-bordered table-hover"">");
                 html.AppendLine(@"<thead class=""thead-dark"">");
                 html.AppendLine("<tr>");
@@ -239,7 +203,7 @@ namespace ConsoleApp
                 html.AppendLine("</thead>");
                 html.AppendLine("<tbody>");
 
-                foreach (var prop in item.Properties)
+                foreach (var prop in schema.Properties)
                 {
                     html.AppendLine("<tr>");
                     html.AppendLine($"<td>{prop.Name}</td>");
@@ -268,42 +232,21 @@ namespace ConsoleApp
             Console.ReadLine();
         }
 
-        //private static IEnumerable<string> GetNodeAndDescendants(KeyValuePair<string, OpenApiSchema> keyValuePair)
-        //{
-        //    return keyValuePair.Value.Properties.SelectMany(GetNodeAndDescendants);
-        //}
-
-        private static List<string> items = new List<string>();
-        private static IEnumerable<string> DoStuff(KeyValuePair<string, OpenApiSchema> kvp)
+        private static List<string> _properties = new List<string>();
+        private static IEnumerable<string> GetProperties(KeyValuePair<string, OpenApiSchema> kvp)
         {
-            //  if (kvp.Value.Reference != null)
-            //  {
-            foreach (var item in kvp.Value.Properties)
+            foreach (var prop in kvp.Value.Properties)
             {
-                var t = item.Key;
-                var w = item.Value.Type;
+                _properties.Add($"{prop.Key};{prop.Value.Type}");
 
-                items.Add($"{item.Key};{item.Value.Type}");
-
-                if (item.Value.Reference != null)
+                if (prop.Value.Reference != null)
                 {
-                    var df = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(item.Value.Reference.Id));
-                    DoStuff(df);
+                    var schema = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(prop.Value.Reference.Id));
+                    GetProperties(schema);
                 }
-                //else
-                //{
-                //    items.Add($"{item.Key};{item.Value.Type}");
-                //}
-
-                //yield return $"{item.Key};{item.Value.Type}";
-
             }
-            //  }
 
-            return items;
-
-            //yield return $"{kvp.Key};{kvp.Value.Type}";
-            //return null;
+            return _properties;
         }
     }
 }
