@@ -190,7 +190,7 @@ namespace ConsoleApp
                 })
             }).OrderBy(schema => schema.Name);
 
-            var f = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals("OutageNotice"));
+            var f = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals("UserActivationContext"));
             var ds = GetProperties(f);
 
             var sb = new StringBuilder("");
@@ -210,6 +210,10 @@ namespace ConsoleApp
 
                     case "string":
                         sb.AppendLine(@"""string"",");
+                        break;
+
+                    case "object":
+                        sb.AppendLine(@" { ");
                         break;
 
                     case "array":
