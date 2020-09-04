@@ -16,7 +16,7 @@ namespace ConsoleApp
         private static OpenApiDocument _openApiDocument;
         private static readonly List<string> Properties = new List<string>();
 
-        private static async System.Threading.Tasks.Task Main()
+        private static async System.Threading.Tasks.Task Main(string[] args)
         {
             var html = new StringBuilder("");
             var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -32,7 +32,7 @@ namespace ConsoleApp
             var apiInformation = $"{ _openApiDocument.Info.Title} {_openApiDocument.Info.Version}";
             var server = _openApiDocument.Servers.FirstOrDefault()?.Url;
 
-            
+
             html.AppendLine(content);
             html.AppendLine($"<h1>{apiInformation}</h1>");
             html.AppendLine($"<p><strong>{server}</strong></p>");
@@ -90,10 +90,10 @@ namespace ConsoleApp
                         html.AppendLine($"<p>{operation.Description}</p>");
                         html.AppendLine("<h3>Summary</h3>");
                         html.AppendLine($"<p>{operation.Summary}</p>");
-                        
+
                         html.AppendLine("<h4>Response Content Type</h4>");
                         if (operation.RequestBodies.Any())
-                        {                            
+                        {
                             html.AppendLine(@"<table class=""table table-bordered table-hover"">");
                             html.AppendLine(@"<thead class=""thead-dark"">");
                             html.AppendLine("<tr>");
@@ -104,10 +104,10 @@ namespace ConsoleApp
                             html.AppendLine("</thead>");
                             html.AppendLine("<tbody>");
 
-                            var contentType = operation.RequestBodies?.SingleOrDefault(requestBody => requestBody.ContentType.Equals("application/json"));                            
+                            var contentType = operation.RequestBodies?.SingleOrDefault(requestBody => requestBody.ContentType.Equals("application/json"));
                             html.AppendLine("<tr>");
-                            html.AppendLine($"<td>{contentType?.ContentType}</td>");
-                            html.AppendLine($"<td>{contentType?.Id}</td>");
+                            html.AppendLine($@"<td>{contentType?.ContentType}</td>");
+                            html.AppendLine($@"<td><a href=""#{contentType?.Id}"">{contentType?.Id}</a></td>");
                             html.AppendLine($"<td>{contentType?.Type}</td>");
                             html.AppendLine("</tr>");
                             html.AppendLine("</tbody>");
@@ -147,7 +147,7 @@ namespace ConsoleApp
                         html.AppendLine(@"<th scope=""col"">In</th>");
                         html.AppendLine(@"<th scope=""col"">Type</th>");
                         html.AppendLine(@"<th scope=""col"">Description</th>");
-                        html.AppendLine(@"<th scope=""col"">IsRequired</th>");
+                        html.AppendLine(@"<th scope=""col"">Is Required</th>");
                         html.AppendLine(@"<th scope=""col"">Enums</th>");
                         html.AppendLine("</tr>");
                         html.AppendLine("</thead>");
@@ -190,13 +190,44 @@ namespace ConsoleApp
                 })
             }).OrderBy(schema => schema.Name);
 
-            var f = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals("UserRegistrationContext"));
+            var f = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals("OutageNotice"));
             var ds = GetProperties(f);
+
+            var sb = new StringBuilder("");
+            sb.AppendLine("{");
+            foreach (var item in ds)
+            {
+                var split = item.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                var prop = split[0];
+                var type = split[1];
+                
+                sb.Append(@$"   ""{prop}"": ");
+                switch (type)
+                {
+                    case "integer":
+                        sb.AppendLine("0,");
+                        break;
+
+                    case "string":
+                        sb.AppendLine(@"""string"",");
+                        break;
+
+                    case "array":
+                        sb.AppendLine($" [ {(split[2].Equals("integer") ? "0" : @"""string""")} ],");                        
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            sb.Remove(sb.Length - 3, 1);
+            sb.Append("}");
+            var json = sb.ToString();
 
             //add endpoint details to html.
             foreach (var schema in schemas)
             {
-                html.AppendLine($"<h2>{schema.Name}</h2>");
+                html.AppendLine($@"<h2 id=""{schema.Name}"">{schema.Name}</h2>");
                 html.AppendLine(@"<table class=""table table-bordered table-hover"">");
                 html.AppendLine(@"<thead class=""thead-dark"">");
                 html.AppendLine("<tr>");
@@ -237,9 +268,9 @@ namespace ConsoleApp
         private static IEnumerable<string> GetProperties(KeyValuePair<string, OpenApiSchema> kvp)
         {
             foreach (var (key, openApiSchema) in kvp.Value.Properties)
-            {
-                Properties.Add($"{key};{openApiSchema.Type}");
-
+            {                
+                Properties.Add($"{key};{openApiSchema.Type};{openApiSchema.Items?.Type ?? ""}");
+                
                 if (openApiSchema.Reference == null) continue;
 
                 var schema = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(openApiSchema.Reference.Id));
