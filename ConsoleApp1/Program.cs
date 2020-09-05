@@ -239,21 +239,6 @@ namespace ConsoleApp
             Console.ReadLine();
         }
 
-        private static IEnumerable<string> GetProperties(KeyValuePair<string, OpenApiSchema> kvp)
-        {
-            foreach (var (key, openApiSchema) in kvp.Value.Properties)
-            {
-                Properties.Add($"{key};{openApiSchema.Type};{openApiSchema.Items?.Type ?? ""}");
-
-                if (openApiSchema.Reference == null) continue;
-
-                var schema = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(openApiSchema.Reference.Id));
-                GetProperties(schema);
-            }
-
-            return Properties;
-        }
-
         private static StringBuilder json = new StringBuilder("{");
         private static string Json(KeyValuePair<string, OpenApiSchema> kvp)
         {
