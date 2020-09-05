@@ -1,6 +1,8 @@
 ﻿using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -195,6 +197,8 @@ namespace ConsoleApp
             var jj = Json(f);
 
             jj = jj.Remove(jj.Length - 1, 1);
+
+            string prettyJson = JToken.Parse(jj).ToString(Formatting.Indented);
 
             var sb = new StringBuilder("");
             sb.AppendLine("{");
