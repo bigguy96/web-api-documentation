@@ -192,6 +192,9 @@ namespace ConsoleApp
 
             var f = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals("UserActivationContext"));
             var ds = GetProperties(f);
+            var jj = Json(f);
+
+            jj = jj.Remove(jj.Length - 1, 1);
 
             var sb = new StringBuilder("");
             sb.AppendLine("{");
@@ -200,7 +203,7 @@ namespace ConsoleApp
                 var split = item.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 var prop = split[0];
                 var type = split[1];
-                
+
                 sb.Append(@$"   ""{prop}"": ");
                 switch (type)
                 {
@@ -217,7 +220,7 @@ namespace ConsoleApp
                         break;
 
                     case "array":
-                        sb.AppendLine($" [ {(split[2].Equals("integer") ? "0" : @"""string""")} ],");                        
+                        sb.AppendLine($" [ {(split[2].Equals("integer") ? "0" : @"""string""")} ],");
                         break;
 
                     default:
@@ -272,9 +275,9 @@ namespace ConsoleApp
         private static IEnumerable<string> GetProperties(KeyValuePair<string, OpenApiSchema> kvp)
         {
             foreach (var (key, openApiSchema) in kvp.Value.Properties)
-            {                
+            {
                 Properties.Add($"{key};{openApiSchema.Type};{openApiSchema.Items?.Type ?? ""}");
-                
+
                 if (openApiSchema.Reference == null) continue;
 
                 var schema = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(openApiSchema.Reference.Id));
@@ -282,6 +285,48 @@ namespace ConsoleApp
             }
 
             return Properties;
+        }
+
+        private static StringBuilder json = new StringBuilder("{");
+        private static string Json(KeyValuePair<string, OpenApiSchema> kvp)
+        {
+            //var json = new StringBuilder("");
+            //json.AppendLine("{");
+            foreach (var (key, openApiSchema) in kvp.Value.Properties)
+            {
+                //Properties.Add($"{key};{openApiSchema.Type};{openApiSchema.Items?.Type ?? ""}");
+
+                json.Append(@$"   ""{key}"": ");
+                switch (openApiSchema.Type)
+                {
+                    case "integer":
+                        json.Append("0,");
+                        break;
+
+                    case "string":
+                        json.Append(@"""string"",");
+                        break;
+
+                    case "object":
+                        json.Append(@" { ");
+                        var schema = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(openApiSchema.Reference.Id));
+                        Json(schema);
+
+                        break;
+
+                    case "array":
+                        json.Append($" [ {(openApiSchema.Items.Type.Equals("integer") ? "0" : @"""string""")} ],");
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            json.Remove(json.Length - 1, 1);
+            json.Append("},");
+
+            return json.ToString();
         }
     }
 }
