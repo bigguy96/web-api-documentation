@@ -193,47 +193,10 @@ namespace ConsoleApp
             }).OrderBy(schema => schema.Name);
 
             var f = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals("UserActivationContext"));
-            var ds = GetProperties(f);
             var jj = Json(f);
-
             jj = jj.Remove(jj.Length - 1, 1);
 
-            string prettyJson = JToken.Parse(jj).ToString(Formatting.Indented);
-
-            var sb = new StringBuilder("");
-            sb.AppendLine("{");
-            foreach (var item in ds)
-            {
-                var split = item.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                var prop = split[0];
-                var type = split[1];
-
-                sb.Append(@$"   ""{prop}"": ");
-                switch (type)
-                {
-                    case "integer":
-                        sb.AppendLine("0,");
-                        break;
-
-                    case "string":
-                        sb.AppendLine(@"""string"",");
-                        break;
-
-                    case "object":
-                        sb.AppendLine(@" { ");
-                        break;
-
-                    case "array":
-                        sb.AppendLine($" [ {(split[2].Equals("integer") ? "0" : @"""string""")} ],");
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-            sb.Remove(sb.Length - 3, 1);
-            sb.Append("}");
-            var json = sb.ToString();
+            var prettyJson = JToken.Parse(jj).ToString(Formatting.Indented);            
 
             //add endpoint details to html.
             foreach (var schema in schemas)
@@ -294,12 +257,8 @@ namespace ConsoleApp
         private static StringBuilder json = new StringBuilder("{");
         private static string Json(KeyValuePair<string, OpenApiSchema> kvp)
         {
-            //var json = new StringBuilder("");
-            //json.AppendLine("{");
             foreach (var (key, openApiSchema) in kvp.Value.Properties)
             {
-                //Properties.Add($"{key};{openApiSchema.Type};{openApiSchema.Items?.Type ?? ""}");
-
                 json.Append(@$"   ""{key}"": ");
                 switch (openApiSchema.Type)
                 {
