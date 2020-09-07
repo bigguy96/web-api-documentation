@@ -16,13 +16,13 @@ namespace ConsoleApp
     {
         private const string RequestUri = "https://wwwapps.tc.gc.ca/Saf-Sec-Sur/13/mtapi/swagger/docs/v1";
         private static OpenApiDocument _openApiDocument;
-        private static readonly List<string> Properties = new List<string>();
+        //private static readonly List<string> Properties = new List<string>();
 
         private static async System.Threading.Tasks.Task Main(string[] args)
         {
             var html = new StringBuilder("");
             var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var template = Path.Combine(myDocuments, "template", "template.html");
+            var template = Path.Combine(myDocuments, "template", "docs-page.html");
             var content = await File.ReadAllTextAsync(template);
 
             var httpClient = new HttpClient
@@ -35,7 +35,7 @@ namespace ConsoleApp
             var server = _openApiDocument.Servers.FirstOrDefault()?.Url;
 
 
-            html.AppendLine(content);
+            //html.AppendLine(content);
             html.AppendLine($"<h1>{apiInformation}</h1>");
             html.AppendLine($"<p><strong>{server}</strong></p>");
 
@@ -45,6 +45,7 @@ namespace ConsoleApp
                 Endpoint = s.Key,
                 Operations = s.Value.Operations.Select(operation => new Operation
                 {
+                    Method = operation.Key.ToString().ToLower(),
                     OperationType = $"{operation.Key.ToString().ToUpper()} - {s.Key}",
                     Description = operation.Value.Description,
                     Summary = operation.Value.Summary,
@@ -76,18 +77,51 @@ namespace ConsoleApp
             }).ToList();
 
             var pathGroupings = paths.Select(s => s.Operations.GroupBy(gb => gb.Name));
+            var previous = string.Empty;
+            var current = string.Empty;
 
             foreach (var path in pathGroupings)
             {
                 foreach (var group in path)
                 {
-                    html.AppendLine($"<h1>{group.Key}</h1>");
+                    current = group.Key;
+
+                    if (!current.Equals(previous))
+                    {
+                        html.AppendLine($"<hr />");
+                        html.AppendLine($"<h1>{group.Key}</h1>");
+                    }
 
                     foreach (var operation in group)
                     {
-                        html.AppendLine(@"<div class=""card border-dark"">");
-                        html.AppendLine($@"<div class=""card-header""><h2 class=""bg-light"">{operation.OperationType}</h2></div>");
-                        html.AppendLine(@"<div class=""card-body"">");
+                        var method = string.Empty;
+                        switch (operation.Method)
+                        {
+                           case "post":
+                                method = "badge-post";
+                                break;
+
+                            case "get":
+                                method = "badge-get";
+                                break;
+
+                            case "put":
+                                method = "badge-put";
+                                break;
+
+                            case "delete":
+                                method = "badge-delete";
+                                break;
+
+                            case "head":
+                                method = "badge-head";
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        html.AppendLine($@"<h2><span class=""badge {method}"">{operation.OperationType.ToUpper()}</span></h2>");
                         html.AppendLine("<h3>Description</h3>");
                         html.AppendLine($"<p>{operation.Description}</p>");
                         html.AppendLine("<h3>Summary</h3>");
@@ -149,7 +183,7 @@ namespace ConsoleApp
                         html.AppendLine(@"<th scope=""col"">In</th>");
                         html.AppendLine(@"<th scope=""col"">Type</th>");
                         html.AppendLine(@"<th scope=""col"">Description</th>");
-                        html.AppendLine(@"<th scope=""col"">Is Required</th>");
+                        html.AppendLine(@"<th scope=""col"">Required</th>");
                         html.AppendLine(@"<th scope=""col"">Enums</th>");
                         html.AppendLine("</tr>");
                         html.AppendLine("</thead>");
@@ -169,12 +203,10 @@ namespace ConsoleApp
 
                         html.AppendLine("</tbody>");
                         html.AppendLine("</table>");
-
-                        html.AppendLine("</div>");
-                        html.AppendLine("</div>");
                     }
 
                 }
+                previous = current;
             }
 
             //get schema information.
@@ -196,7 +228,7 @@ namespace ConsoleApp
             var jj = Json(f);
             jj = jj.Remove(jj.Length - 1, 1);
 
-            var prettyJson = JToken.Parse(jj).ToString(Formatting.Indented);            
+            var prettyJson = JToken.Parse(jj).ToString(Formatting.Indented);
 
             //add endpoint details to html.
             foreach (var schema in schemas)
@@ -230,16 +262,17 @@ namespace ConsoleApp
                 html.AppendLine("</table>");
             }
 
-            html.AppendLine("</body>");
-            html.AppendLine("</html>");
+            //html.AppendLine("</body>");
+            //html.AppendLine("</html>");
 
-            await File.WriteAllTextAsync(Path.Combine(myDocuments, "template", "schemas.html"), html.ToString());
+            content = content.Replace("{content}", html.ToString());
+            await File.WriteAllTextAsync(Path.Combine(myDocuments, "template", "schemas.html"), content);
 
             Console.WriteLine("Done!");
             Console.ReadLine();
         }
 
-        private static StringBuilder json = new StringBuilder("{");
+        private static readonly StringBuilder json = new StringBuilder("{");
         private static string Json(KeyValuePair<string, OpenApiSchema> kvp)
         {
             foreach (var (key, openApiSchema) in kvp.Value.Properties)
