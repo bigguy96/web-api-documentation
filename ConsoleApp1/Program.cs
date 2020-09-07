@@ -35,7 +35,6 @@ namespace ConsoleApp
             var apiInformation = $"{ _openApiDocument.Info.Title} {_openApiDocument.Info.Version}";
             var server = _openApiDocument.Servers.FirstOrDefault()?.Url;
 
-
             //html.AppendLine(content);
             html.AppendLine($"<h1>{apiInformation}</h1>");
             html.AppendLine($"<p><strong>{server}</strong></p>");
@@ -159,6 +158,7 @@ namespace ConsoleApp
                             {
                                 var sampleJson = FormatJson(contentType.Id);
 
+                                html.AppendLine("<h4>Sample Request Body</h4>");
                                 html.AppendLine(@"<div class=""docs-code-block"">");
                                 html.AppendLine(@"<pre class=""shadow-lg rounded""><code class=""json hljs"">");
                                 html.AppendLine($"{sampleJson}");
@@ -221,9 +221,6 @@ namespace ConsoleApp
                         html.AppendLine("</tbody>");
                         html.AppendLine("</table>");
                     }
-
-
-
                 }
                 previous = current;
                 //sidemenu.AppendLine("</ul>");
@@ -320,10 +317,37 @@ namespace ConsoleApp
                         break;
 
                     case "array":
-                        json.Append($" [ {(openApiSchema.Items.Type.Equals("integer") ? "0" : @"""string""")} ],");
+                        if (openApiSchema.Items.Type.Equals("integer"))
+                        {
+                            json.Append($" [ 0 ],");
+                        }
+                        else if (openApiSchema.Items.Type.Equals("string"))
+                        {
+                            json.Append(@$" [ ""string"" ],");
+                        }
+                        //else if (openApiSchema.Items.Type.Equals("array"))
+                        //{
+                        //    foreach (var item in openApiSchema.Items.Properties)
+                        //    {
+                        //        Json(item);
+                        //    }
+                            
+                        //}
+                        else if (openApiSchema.Items.Type.Equals("object"))
+                        {
+                            json.Append(" [{ ");
+                            foreach (var item in openApiSchema.Items.Properties)
+                            {
+                                json.Append(Json2(item));
+                            }
+
+                            json.Append(" }],");                            
+                        }
+
                         break;
 
                     default:
+                        json.Append($@"""{openApiSchema.Type}"",");
                         break;
                 }
             }
@@ -332,6 +356,40 @@ namespace ConsoleApp
             json.Append("},");
 
             return json.ToString();
+        }
+
+        private static string Json2(KeyValuePair<string, OpenApiSchema> kvp)
+        {
+            var sb = new StringBuilder("");
+            sb.Append(@$"   ""{kvp.Key}"": ");
+            switch (kvp.Value.Type)
+            {
+                case "integer":
+                    sb.Append("0,");
+                    break;
+
+                case "number":
+                    sb.Append("0,");
+                    break;
+
+                case "string":
+                    sb.Append(@"""string"",");
+                    break;
+
+                case "boolean":
+                    sb.Append(@"true,");
+                    break;
+
+                case "object":
+                    sb.Append(@"{ ""__identity"": {}");                    
+                    sb.Append(" },");
+                    break;                
+
+                default:
+                    break;
+            }
+
+            return sb.ToString();
         }
 
         private static string FormatJson(string reference)
@@ -343,7 +401,7 @@ namespace ConsoleApp
 
             var prettyJson = JToken.Parse(jj).ToString(Formatting.Indented);
 
-            return prettyJson;
+             return prettyJson;
         }
     }
 }
