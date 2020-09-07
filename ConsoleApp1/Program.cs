@@ -21,6 +21,7 @@ namespace ConsoleApp
         private static async System.Threading.Tasks.Task Main(string[] args)
         {
             var html = new StringBuilder("");
+            var sidemenu = new StringBuilder("");
             var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var template = Path.Combine(myDocuments, "template", "docs-page.html");
             var content = await File.ReadAllTextAsync(template);
@@ -46,7 +47,7 @@ namespace ConsoleApp
                 Operations = s.Value.Operations.Select(operation => new Operation
                 {
                     Method = operation.Key.ToString().ToLower(),
-                    OperationType = $"{operation.Key.ToString().ToUpper()} - {s.Key}",
+                    OperationType = $"{s.Key}",
                     Description = operation.Value.Description,
                     Summary = operation.Value.Summary,
                     Name = operation.Value.Tags[0].Name,
@@ -89,7 +90,10 @@ namespace ConsoleApp
                     if (!current.Equals(previous))
                     {
                         html.AppendLine($"<hr />");
-                        html.AppendLine($"<h1>{group.Key}</h1>");
+                        html.AppendLine($@"<h1 id=""{group.Key}"">{group.Key}</h1>");
+
+                        sidemenu.AppendLine(@"<ul class=""section-items list-unstyled nav flex-column pb-3"">");
+                        sidemenu.AppendLine(@$"<li class=""nav-item section-title""><a class=""nav-link scrollto active"" href=""#{group.Key}"">{group.Key}</a></li>");
                     }
 
                     foreach (var operation in group)
@@ -97,7 +101,7 @@ namespace ConsoleApp
                         var method = string.Empty;
                         switch (operation.Method)
                         {
-                           case "post":
+                            case "post":
                                 method = "badge-post";
                                 break;
 
@@ -121,11 +125,13 @@ namespace ConsoleApp
                                 break;
                         }
 
-                        html.AppendLine($@"<h2><span class=""badge {method}"">{operation.OperationType.ToUpper()}</span></h2>");
+                        html.AppendLine($@"<h2 id=""{operation.OperationType.Replace("/", "")}""><span class=""badge {method}"">{operation.Method.ToUpper()} - {operation.OperationType}</span></h2>");
                         html.AppendLine("<h3>Description</h3>");
                         html.AppendLine($"<p>{operation.Description}</p>");
                         html.AppendLine("<h3>Summary</h3>");
                         html.AppendLine($"<p>{operation.Summary}</p>");
+
+                        sidemenu.AppendLine($@"<li class=""nav-item""><a class=""nav-link scrollto"" href=""#{operation.OperationType.Replace("/", "")}"">{operation.Method} - {operation.OperationType}</a></li>");
 
                         html.AppendLine("<h4>Response Content Type</h4>");
                         if (operation.RequestBodies.Any())
@@ -148,6 +154,17 @@ namespace ConsoleApp
                             html.AppendLine("</tr>");
                             html.AppendLine("</tbody>");
                             html.AppendLine("</table>");
+
+                            if (contentType.Id != null)
+                            {
+                                var sampleJson = FormatJson(contentType.Id);
+
+                                html.AppendLine(@"<div class=""docs-code-block"">");
+                                html.AppendLine(@"<pre class=""shadow-lg rounded""><code class=""json hljs"">");
+                                html.AppendLine($"{sampleJson}");
+                                html.AppendLine(@"</code></pre></div>");
+                            }
+
                         }
                         else
                         {
@@ -205,8 +222,12 @@ namespace ConsoleApp
                         html.AppendLine("</table>");
                     }
 
+
+
                 }
                 previous = current;
+                //sidemenu.AppendLine("</ul>");
+
             }
 
             //get schema information.
@@ -223,12 +244,6 @@ namespace ConsoleApp
                     })
                 })
             }).OrderBy(schema => schema.Name);
-
-            var f = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals("UserActivationContext"));
-            var jj = Json(f);
-            jj = jj.Remove(jj.Length - 1, 1);
-
-            var prettyJson = JToken.Parse(jj).ToString(Formatting.Indented);
 
             //add endpoint details to html.
             foreach (var schema in schemas)
@@ -266,13 +281,14 @@ namespace ConsoleApp
             //html.AppendLine("</html>");
 
             content = content.Replace("{content}", html.ToString());
+            content = content.Replace("{sidemenu}", sidemenu.ToString());
             await File.WriteAllTextAsync(Path.Combine(myDocuments, "template", "schemas.html"), content);
 
             Console.WriteLine("Done!");
             Console.ReadLine();
         }
 
-        private static readonly StringBuilder json = new StringBuilder("{");
+        private static StringBuilder json;// = new StringBuilder("{");
         private static string Json(KeyValuePair<string, OpenApiSchema> kvp)
         {
             foreach (var (key, openApiSchema) in kvp.Value.Properties)
@@ -284,8 +300,16 @@ namespace ConsoleApp
                         json.Append("0,");
                         break;
 
+                    case "number":
+                        json.Append("0,");
+                        break;
+
                     case "string":
                         json.Append(@"""string"",");
+                        break;
+
+                    case "boolean":
+                        json.Append(@"true,");
                         break;
 
                     case "object":
@@ -308,6 +332,18 @@ namespace ConsoleApp
             json.Append("},");
 
             return json.ToString();
+        }
+
+        private static string FormatJson(string reference)
+        {
+            json = new StringBuilder("{");
+            var f = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(reference));
+            var jj = Json(f);
+            jj = jj.Remove(jj.Length - 1, 1);
+
+            var prettyJson = JToken.Parse(jj).ToString(Formatting.Indented);
+
+            return prettyJson;
         }
     }
 }
