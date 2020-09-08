@@ -124,13 +124,14 @@ namespace ConsoleApp
                                 break;
                         }
 
-                        html.AppendLine($@"<h2 id=""{operation.OperationType.Replace("/", "")}""><span class=""badge {method}"">{operation.Method.ToUpper()} - {operation.OperationType}</span></h2>");
+                        var guid = Guid.NewGuid().ToString().Substring(0,8);
+                        html.AppendLine($@"<h2 id=""{guid}""><span class=""badge {method}"">{operation.Method.ToUpper()} - {operation.OperationType}</span></h2>");
                         html.AppendLine("<h3>Description</h3>");
                         html.AppendLine($"<p>{operation.Description}</p>");
                         html.AppendLine("<h3>Summary</h3>");
                         html.AppendLine($"<p>{operation.Summary}</p>");
 
-                        sidemenu.AppendLine($@"<li class=""nav-item""><a class=""nav-link scrollto"" href=""#{operation.OperationType.Replace("/", "")}"">{operation.Method} - {operation.OperationType}</a></li>");
+                        sidemenu.AppendLine($@"<li class=""nav-item""><a class=""nav-link scrollto"" href=""#{guid}"">{operation.Method} - {operation.OperationType}</a></li>");
 
                         html.AppendLine("<h4>Response Content Type</h4>");
                         if (operation.RequestBodies.Any())
@@ -286,7 +287,7 @@ namespace ConsoleApp
         }
 
         private static StringBuilder json;// = new StringBuilder("{");
-        private static string Json(KeyValuePair<string, OpenApiSchema> kvp)
+        private static string GetPropertyValues(KeyValuePair<string, OpenApiSchema> kvp)
         {
             foreach (var (key, openApiSchema) in kvp.Value.Properties)
             {
@@ -312,7 +313,7 @@ namespace ConsoleApp
                     case "object":
                         json.Append(@" { ");
                         var schema = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(openApiSchema.Reference.Id));
-                        Json(schema);
+                        GetPropertyValues(schema);
 
                         break;
 
@@ -331,17 +332,17 @@ namespace ConsoleApp
                         //    {
                         //        Json(item);
                         //    }
-                            
+
                         //}
                         else if (openApiSchema.Items.Type.Equals("object"))
                         {
                             json.Append(" [{ ");
                             foreach (var item in openApiSchema.Items.Properties)
                             {
-                                json.Append(Json2(item));
+                                json.Append(GetPropertyValue(item));
                             }
 
-                            json.Append(" }],");                            
+                            json.Append(" }],");
                         }
 
                         break;
@@ -358,7 +359,7 @@ namespace ConsoleApp
             return json.ToString();
         }
 
-        private static string Json2(KeyValuePair<string, OpenApiSchema> kvp)
+        private static string GetPropertyValue(KeyValuePair<string, OpenApiSchema> kvp)
         {
             var sb = new StringBuilder("");
             sb.Append(@$"   ""{kvp.Key}"": ");
@@ -381,9 +382,9 @@ namespace ConsoleApp
                     break;
 
                 case "object":
-                    sb.Append(@"{ ""__identity"": {}");                    
+                    sb.Append(@"{ ""__identity"": {}");
                     sb.Append(" },");
-                    break;                
+                    break;
 
                 default:
                     break;
@@ -396,12 +397,12 @@ namespace ConsoleApp
         {
             json = new StringBuilder("{");
             var f = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(reference));
-            var jj = Json(f);
+            var jj = GetPropertyValues(f);
             jj = jj.Remove(jj.Length - 1, 1);
 
             var prettyJson = JToken.Parse(jj).ToString(Formatting.Indented);
 
-             return prettyJson;
+            return prettyJson;
         }
     }
 }
