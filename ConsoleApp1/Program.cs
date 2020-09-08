@@ -91,6 +91,7 @@ namespace ConsoleApp
                         html.AppendLine($"<hr />");
                         html.AppendLine($@"<h1 id=""{group.Key}"">{group.Key}</h1>");
 
+                        sidemenu.AppendLine(@"</ul>");
                         sidemenu.AppendLine(@"<ul class=""section-items list-unstyled nav flex-column pb-3"">");
                         sidemenu.AppendLine(@$"<li class=""nav-item section-title""><a class=""nav-link scrollto active"" href=""#{group.Key}"">{group.Key}</a></li>");
                     }
