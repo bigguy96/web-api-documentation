@@ -16,14 +16,13 @@ namespace ConsoleApp
     {
         private const string RequestUri = "https://wwwapps.tc.gc.ca/Saf-Sec-Sur/13/mtapi/swagger/docs/v1";
         private static OpenApiDocument _openApiDocument;
-        //private static readonly List<string> Properties = new List<string>();
 
         private static async System.Threading.Tasks.Task Main(string[] args)
         {
             var html = new StringBuilder("");
             var sidemenu = new StringBuilder("");
             var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var template = Path.Combine(myDocuments, "template", "docs-page.html");
+            var template = Path.Combine(myDocuments, "template", "template.html");
             var content = await File.ReadAllTextAsync(template);
 
             var httpClient = new HttpClient
@@ -40,35 +39,35 @@ namespace ConsoleApp
             html.AppendLine($"<p><strong>{server}</strong></p>");
 
             //get all endpoint information.
-            var paths = _openApiDocument.Paths.Select(s => new Paths
+            var paths = _openApiDocument.Paths.Select(path => new Paths
             {
-                Endpoint = s.Key,
-                Operations = s.Value.Operations.Select(operation => new Operation
+                Endpoint = path.Key,
+                Operations = path.Value.Operations.Select(operation => new Operation
                 {
                     Method = operation.Key.ToString().ToLower(),
-                    OperationType = $"{s.Key}",
+                    OperationType = $"{path.Key}",
                     Description = operation.Value.Description,
                     Summary = operation.Value.Summary,
                     Name = operation.Value.Tags[0].Name,
-                    RequestBodies = operation.Value.RequestBody != null ? operation.Value.RequestBody.Content.Select(c => new RequestBody
+                    RequestBodies = operation.Value.RequestBody != null ? operation.Value.RequestBody.Content.Select(requestBody => new RequestBody
                     {
-                        ContentType = c.Key,
-                        Id = c.Value.Schema?.Reference?.Id,
-                        Type = c.Value.Schema?.Type
+                        ContentType = requestBody.Key,
+                        Id = requestBody.Value.Schema?.Reference?.Id,
+                        Type = requestBody.Value.Schema?.Type
                     }) : new List<RequestBody>(),
-                    Responses = operation.Value.Responses.Select(r => new Response
+                    Responses = operation.Value.Responses.Select(response => new Response
                     {
-                        Name = r.Key,
-                        Description = r.Value.Description
+                        Name = response.Key,
+                        Description = response.Value.Description
                     }),
-                    Parameters = operation.Value.Parameters.Select(p => new Parameter
+                    Parameters = operation.Value.Parameters.Select(parameter => new Parameter
                     {
-                        Name = p.Name,
-                        In = p.In,
-                        Type = p.Schema.Type,
-                        Description = p.Description,
-                        IsRequired = p.Required,
-                        Enumerations = p.Schema.Enum.Select(e => new Enums
+                        Name = parameter.Name,
+                        In = parameter.In,
+                        Type = parameter.Schema.Type,
+                        Description = parameter.Description,
+                        IsRequired = parameter.Required,
+                        Enumerations = parameter.Schema.Enum.Select(e => new Enums
                         {
                             Value = ((OpenApiPrimitive<string>)e).Value
                         })
@@ -98,32 +97,7 @@ namespace ConsoleApp
 
                     foreach (var operation in group)
                     {
-                        var method = string.Empty;
-                        switch (operation.Method)
-                        {
-                            case "post":
-                                method = "badge-post";
-                                break;
-
-                            case "get":
-                                method = "badge-get";
-                                break;
-
-                            case "put":
-                                method = "badge-put";
-                                break;
-
-                            case "delete":
-                                method = "badge-delete";
-                                break;
-
-                            case "head":
-                                method = "badge-head";
-                                break;
-
-                            default:
-                                break;
-                        }
+                        var method = GetApiMethod(operation);
 
                         var guid = Guid.NewGuid().ToString().Substring(0,8);
                         html.AppendLine($@"<h2 id=""{guid}""><span class=""badge {method}"">{operation.Method.ToUpper()} - {operation.OperationType}</span></h2>");
@@ -156,7 +130,7 @@ namespace ConsoleApp
                             html.AppendLine("</tbody>");
                             html.AppendLine("</table>");
 
-                            if (contentType.Id != null)
+                            if (contentType?.Id != null)
                             {
                                 var sampleJson = FormatJson(contentType.Id);
 
@@ -287,45 +261,46 @@ namespace ConsoleApp
             Console.ReadLine();
         }
 
-        private static StringBuilder json;// = new StringBuilder("{");
-        private static string GetPropertyValues(KeyValuePair<string, OpenApiSchema> kvp)
+        private static StringBuilder _json;
+
+        private static string ConvertPropertiesToJson(KeyValuePair<string, OpenApiSchema> kvp)
         {
             foreach (var (key, openApiSchema) in kvp.Value.Properties)
             {
-                json.Append(@$"   ""{key}"": ");
+                _json.Append(@$"   ""{key}"": ");
                 switch (openApiSchema.Type)
                 {
                     case "integer":
-                        json.Append("0,");
+                        _json.Append("0,");
                         break;
 
                     case "number":
-                        json.Append("0,");
+                        _json.Append("0,");
                         break;
 
                     case "string":
-                        json.Append(@"""string"",");
+                        _json.Append(@"""string"",");
                         break;
 
                     case "boolean":
-                        json.Append(@"true,");
+                        _json.Append(@"true,");
                         break;
 
                     case "object":
-                        json.Append(@" { ");
+                        _json.Append(@" { ");
                         var schema = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(openApiSchema.Reference.Id));
-                        GetPropertyValues(schema);
+                        ConvertPropertiesToJson(schema);
 
                         break;
 
                     case "array":
                         if (openApiSchema.Items.Type.Equals("integer"))
                         {
-                            json.Append($" [ 0 ],");
+                            _json.Append(" [ 0 ],");
                         }
                         else if (openApiSchema.Items.Type.Equals("string"))
                         {
-                            json.Append(@$" [ ""string"" ],");
+                            _json.Append(@" [ ""string"" ],");
                         }
                         //else if (openApiSchema.Items.Type.Equals("array"))
                         //{
@@ -337,30 +312,30 @@ namespace ConsoleApp
                         //}
                         else if (openApiSchema.Items.Type.Equals("object"))
                         {
-                            json.Append(" [{ ");
+                            _json.Append(" [{ ");
                             foreach (var item in openApiSchema.Items.Properties)
                             {
-                                json.Append(GetPropertyValue(item));
+                                _json.Append(ConvertPropertyToJson(item));
                             }
 
-                            json.Append(" }],");
+                            _json.Append(" }],");
                         }
 
                         break;
 
                     default:
-                        json.Append($@"""{openApiSchema.Type}"",");
+                        _json.Append($@"""{openApiSchema.Type}"",");
                         break;
                 }
             }
 
-            json.Remove(json.Length - 1, 1);
-            json.Append("},");
+            _json.Remove(_json.Length - 1, 1);
+            _json.Append("},");
 
-            return json.ToString();
+            return _json.ToString();
         }
 
-        private static string GetPropertyValue(KeyValuePair<string, OpenApiSchema> kvp)
+        private static string ConvertPropertyToJson(KeyValuePair<string, OpenApiSchema> kvp)
         {
             var sb = new StringBuilder("");
             sb.Append(@$"   ""{kvp.Key}"": ");
@@ -386,9 +361,6 @@ namespace ConsoleApp
                     sb.Append(@"{ ""__identity"": {}");
                     sb.Append(" },");
                     break;
-
-                default:
-                    break;
             }
 
             return sb.ToString();
@@ -396,14 +368,27 @@ namespace ConsoleApp
 
         private static string FormatJson(string reference)
         {
-            json = new StringBuilder("{");
-            var f = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(reference));
-            var jj = GetPropertyValues(f);
-            jj = jj.Remove(jj.Length - 1, 1);
+            _json = new StringBuilder("{");
+            var schema = _openApiDocument.Components.Schemas.SingleOrDefault(s => s.Key.Equals(reference));
+            var propertyValues = ConvertPropertiesToJson(schema);
+            propertyValues = propertyValues.Remove(propertyValues.Length - 1, 1);
 
-            var prettyJson = JToken.Parse(jj).ToString(Formatting.Indented);
+            var prettyJson = JToken.Parse(propertyValues).ToString(Formatting.Indented);
 
             return prettyJson;
+        }
+
+        private static string GetApiMethod(Operation operation)
+        {
+            return operation.Method switch
+            {
+                "post" => "badge-post",
+                "get" => "badge-get",
+                "put" => "badge-put",
+                "delete" => "badge-delete",
+                "head" => "badge-head",
+                _ => string.Empty
+            };
         }
     }
 }
