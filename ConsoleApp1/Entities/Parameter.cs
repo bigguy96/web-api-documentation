@@ -1,7 +1,7 @@
-﻿using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Microsoft.OpenApi.Models;
 
-namespace ConsoleApp
+namespace ConsoleApp.Entities
 {
     public class Parameter
     {

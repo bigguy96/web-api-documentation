@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ConsoleApp
+namespace ConsoleApp.Entities
 {
     public class Operation
     {
