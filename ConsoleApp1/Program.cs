@@ -22,7 +22,7 @@ namespace ConsoleApp
             var html = new StringBuilder("");
             var sidemenu = new StringBuilder("");
             var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var template = Path.Combine(myDocuments, "template", "template.html");
+            var template = Path.Combine(myDocuments, "template", "docs-page.html");
             var content = await File.ReadAllTextAsync(template);
 
             var httpClient = new HttpClient
