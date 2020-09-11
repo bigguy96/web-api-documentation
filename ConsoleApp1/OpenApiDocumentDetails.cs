@@ -13,6 +13,7 @@ namespace ConsoleApp
         public string WebApiTitle { get; private set; }
         public string WebApiUrl { get; private set; }
         public IEnumerable<Paths> Paths { get; private set; }
+        public OpenApiComponents Components { get; private set; }
         public IEnumerable<Schema> Schemas { get; private set; }
 
         public OpenApiDocumentDetails(OpenApiDocument openApiDocument)
@@ -21,7 +22,13 @@ namespace ConsoleApp
 
             GetWebApiDetails();
             GetPathDetails();
+            GetComponentsDetails();
             GetSchemaDetails();
+        }
+
+        private void GetComponentsDetails()
+        {
+            Components = _openApiDocument.Components;
         }
 
         private void GetWebApiDetails()
