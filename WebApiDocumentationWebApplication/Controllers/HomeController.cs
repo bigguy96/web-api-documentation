@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using ConsoleApp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebApiDocumentationWebApplication.Models;
@@ -18,9 +19,20 @@ namespace WebApiDocumentationWebApplication.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
-            return View();
+            var openApiDocument = await OpenApiDocumentHelper.CreateAsync();
+            var openApiDocumentDetails = new OpenApiDocumentDetails(openApiDocument);
+            var pathGroupings = openApiDocumentDetails.Paths.Select(path => path.Operations.GroupBy(operation => operation.Name));
+            var vm = new HomeViewModel 
+            { 
+                Paths = openApiDocumentDetails.Paths,
+                Groupings = pathGroupings,
+                WebApiTitle = openApiDocumentDetails.WebApiTitle,
+                WebApiUrl = openApiDocumentDetails.WebApiUrl
+            };
+
+            return View(vm);
         }
 
         public IActionResult Privacy()
