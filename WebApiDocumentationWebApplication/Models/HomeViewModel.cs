@@ -1,5 +1,6 @@
 ﻿using ConsoleApp;
 using ConsoleApp.Entities;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,6 @@ namespace WebApiDocumentationWebApplication.Models
         public string WebApiTitle { get; internal set; }
         public string WebApiUrl { get; internal set; }
         public IEnumerable<IEnumerable<IGrouping<string, Operation>>> Groupings { get; internal set; }
+        public OpenApiComponents Components { get; internal set; }
     }
 }

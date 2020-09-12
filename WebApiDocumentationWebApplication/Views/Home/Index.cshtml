@@ -18,7 +18,7 @@
 
                 foreach (var operation in group)
                 {
-                    <h3>@string.Format("{0} - {1}", operation.Method.ToUpper(), operation.OperationType.ToUpper())</h3>
+                    <h3><span class="badge @operation.GetBadge()">@string.Format("{0} - {1}", operation.Method.ToUpper(), operation.OperationType)</span></h3>
                     <h4>Description</h4>
                     <p>@operation.Description</p>
                     <h4>Summary</h4>
@@ -41,11 +41,23 @@
                                 }
                                 <tr>
                                     <td>@contentType?.ContentType</td>
-                                    <td><a href="#@contentType?.Id">contentType?.Id</a></td>
-                                    <td>contentType?.Type</td>
+                                    <td><a href="#@contentType?.Id">@contentType?.Id</a></td>
+                                    <td>@contentType?.Type</td>
                                 </tr>
                             </tbody>
                         </table>
+
+                        if (contentType?.Id != null)
+                        {
+                            <h4>Sample Request Body</h4>
+                            <div class="docs-code-block">
+<pre class="shadow-lg rounded">
+ <code class="json hljs">
+ @contentType.Id.FormatJson(Model.Components)
+</code>
+</pre>
+                            </div>
+                        }
                     }
                     else
                     {
@@ -102,3 +114,7 @@
         }
     </div>
 </div>
+
+@functions{
+
+}

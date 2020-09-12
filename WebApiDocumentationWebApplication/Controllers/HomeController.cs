@@ -28,6 +28,7 @@ namespace WebApiDocumentationWebApplication.Controllers
             { 
                 Paths = openApiDocumentDetails.Paths,
                 Groupings = pathGroupings,
+                Components = openApiDocumentDetails.Components,
                 WebApiTitle = openApiDocumentDetails.WebApiTitle,
                 WebApiUrl = openApiDocumentDetails.WebApiUrl
             };
