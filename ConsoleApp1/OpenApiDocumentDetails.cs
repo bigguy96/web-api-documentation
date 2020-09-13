@@ -1,10 +1,10 @@
-﻿using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using ConsoleApp.Entities;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
+using WebApiDocumentationLibrary.Entities;
 
-namespace ConsoleApp
+namespace WebApiDocumentationLibrary
 {
     public class OpenApiDocumentDetails
     {

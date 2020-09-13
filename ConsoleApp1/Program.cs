@@ -1,17 +1,6 @@
-﻿using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using Microsoft.OpenApi.Readers;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using ConsoleApp.Entities;
+﻿using System;
 
-namespace ConsoleApp
+namespace WebApiDocumentationLibrary
 {
     internal class Program
     {

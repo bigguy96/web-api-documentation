@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ConsoleApp.Entities
+namespace WebApiDocumentationLibrary.Entities
 {
     public class Paths
     {

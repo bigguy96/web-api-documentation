@@ -1,10 +1,10 @@
-﻿using ConsoleApp.Entities;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using WebApiDocumentationLibrary.Entities;
 
 namespace WebApiDocumentationWebApplication.Extensions
 {

@@ -1,4 +1,4 @@
-﻿namespace ConsoleApp.Entities
+﻿namespace WebApiDocumentationLibrary.Entities
 {
     public class Response
     {

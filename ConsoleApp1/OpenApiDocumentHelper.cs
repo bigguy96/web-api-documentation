@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 
-namespace ConsoleApp
+namespace WebApiDocumentationLibrary
 {
     public class OpenApiDocumentHelper
     {

@@ -1,15 +1,15 @@
-﻿using ConsoleApp.Entities;
-using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using WebApiDocumentationLibrary.Entities;
 
-namespace ConsoleApp
+namespace WebApiDocumentationLibrary
 {
    public class HtmlGenerator
     {
