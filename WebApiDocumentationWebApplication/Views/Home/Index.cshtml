@@ -4,17 +4,57 @@
     ViewData["Title"] = "Home Page";
 }
 
+@{
+    var previous = string.Empty;
+    var current = string.Empty;
+}
+
+<div id="docs-sidebar" class="docs-sidebar">
+    <nav id="docs-nav" class="docs-nav navbar">
+        @foreach (var grouping in Model.Groupings)
+        {
+            foreach (var group in grouping)
+            {
+                current = group.Key;
+
+                if (!current.Equals(previous))
+                {
+                    <h2 id="@group.Key">@group.Key</h2>
+                }
+
+                <ul class="section-items list-unstyled nav flex-column pb-3">
+                    @foreach (var operation in group)
+                    {
+                        <li class="nav-item"><a class="nav-link scrollto" href="#">@string.Format("{0} - {1}", operation.Method.ToUpper(), operation.OperationType)</a></li>
+                    }
+                </ul>
+            }
+            previous = current;
+        }
+    </nav>
+</div>
+
+@{
+    previous = string.Empty;
+    current = string.Empty;
+}
+
 <div class="docs-content">
     <div class="container">
         <h1>@Model.WebApiTitle</h1>
         <p><strong><a href="@Model.WebApiUrl">@Model.WebApiUrl</a></strong></p>
-        <hr />
 
         @foreach (var grouping in Model.Groupings)
         {
             foreach (var group in grouping)
             {
-                <h2 id="@group.Key">@group.Key</h2>
+                current = group.Key;
+
+                if (!current.Equals(previous))
+                {
+                    <hr />
+                    <h2 id="@group.Key">@group.Key</h2>
+                }
 
                 foreach (var operation in group)
                 {
@@ -52,7 +92,7 @@
                             <h4>Sample Request Body</h4>
                             <div class="docs-code-block">
 <pre class="shadow-lg rounded">
- <code class="json hljs">
+                                <code class="json hljs">
  @contentType.Id.FormatJson(Model.Components)
 </code>
 </pre>
@@ -111,10 +151,9 @@
                     </table>
                 }
             }
+            {
+                previous = current;
+            }
         }
     </div>
 </div>
-
-@functions{
-
-}
