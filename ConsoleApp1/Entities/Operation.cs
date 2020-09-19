@@ -13,7 +13,7 @@ namespace WebApiDocumentationLibrary.Entities
         {
             get
             {
-                return $"{Method} - {Endpoint}";
+                return $"{Method.ToUpper()} - {Endpoint}";
             }
         }
         public IEnumerable<Parameter> Parameters { get; set; }
