@@ -58,13 +58,13 @@ namespace WebApiDocumentationLibrary
                         var method = GetApiMethod(operation);
 
                         var guid = Guid.NewGuid().ToString().Substring(0, 8);
-                        html.AppendLine($@"<h2 id=""{guid}""><span class=""badge {method}"">{operation.Method.ToUpper()} - {operation.OperationType}</span></h2>");
+                        html.AppendLine($@"<h2 id=""{guid}""><span class=""badge {method}"">{operation.Method.ToUpper()} - {operation.Endpoint}</span></h2>");
                         html.AppendLine("<h3>Description</h3>");
                         html.AppendLine($"<p>{operation.Description}</p>");
                         html.AppendLine("<h3>Summary</h3>");
                         html.AppendLine($"<p>{operation.Summary}</p>");
 
-                        sidemenu.AppendLine($@"<li class=""nav-item""><a class=""nav-link scrollto"" href=""#{guid}"">{operation.Method} - {operation.OperationType}</a></li>");
+                        sidemenu.AppendLine($@"<li class=""nav-item""><a class=""nav-link scrollto"" href=""#{guid}"">{operation.Method} - {operation.Endpoint}</a></li>");
 
                         html.AppendLine("<h4>Response Content Type</h4>");
                         if (operation.RequestBodies.Any())

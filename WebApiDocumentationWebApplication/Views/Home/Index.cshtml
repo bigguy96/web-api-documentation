@@ -4,156 +4,124 @@
     ViewData["Title"] = "Home Page";
 }
 
-@{
-    var previous = string.Empty;
-    var current = string.Empty;
-}
 
-<div id="docs-sidebar" class="docs-sidebar">
+@*<div id="docs-sidebar" class="docs-sidebar">
     <nav id="docs-nav" class="docs-nav navbar">
-        @foreach (var grouping in Model.Groupings)
-        {
-            foreach (var group in grouping)
+        <ul class="section-items list-unstyled nav flex-column pb-3">
+            @foreach (var paths in Model.Paths)
             {
-                current = group.Key;
-
-                if (!current.Equals(previous))
+                @foreach (var operation in paths.Operations)
                 {
-                    <h2 id="@group.Key">@group.Key</h2>
+                    <li class="nav-item"><a class="nav-link scrollto" href="#">@operation.FullPath (@operation.Name)</a></li>
                 }
-
-                <ul class="section-items list-unstyled nav flex-column pb-3">
-                    @foreach (var operation in group)
-                    {
-                        <li class="nav-item"><a class="nav-link scrollto" href="#">@string.Format("{0} - {1}", operation.Method.ToUpper(), operation.OperationType)</a></li>
-                    }
-                </ul>
             }
-            previous = current;
-        }
+        </ul>
     </nav>
-</div>
-
-@{
-    previous = string.Empty;
-    current = string.Empty;
-}
+</div>*@
 
 <div class="docs-content">
     <div class="container">
         <h1>@Model.WebApiTitle</h1>
         <p><strong><a href="@Model.WebApiUrl">@Model.WebApiUrl</a></strong></p>
 
-        @foreach (var grouping in Model.Groupings)
+        @foreach (var paths in Model.Paths)
         {
-            foreach (var group in grouping)
+            foreach (var operation in paths.Operations)
             {
-                current = group.Key;
+                <h2>@operation.Name</h2>
+                <h3><span class="badge @operation.GetBadge()">@operation.FullPath</span></h3>
+                <h4>Description</h4>
+                <p>@operation.Description</p>
+                <h4>Summary</h4>
+                <p>@operation.Summary</p>
 
-                if (!current.Equals(previous))
+                <h4>Response Content Type</h4>
+                if (operation.RequestBodies.Any())
                 {
-                    <hr />
-                    <h2 id="@group.Key">@group.Key</h2>
-                }
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Content Type</th>
+                                <th scope="col">Id</th>
+                                <th scope="col">Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var contentType = operation.RequestBodies?.SingleOrDefault(requestBody => requestBody.ContentType.Equals("application/json"));
+                            }
+                            <tr>
+                                <td>@contentType?.ContentType</td>
+                                <td><a href="#@contentType?.Id">@contentType?.Id</a></td>
+                                <td>@contentType?.Type</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                foreach (var operation in group)
-                {
-                    <h3><span class="badge @operation.GetBadge()">@string.Format("{0} - {1}", operation.Method.ToUpper(), operation.OperationType)</span></h3>
-                    <h4>Description</h4>
-                    <p>@operation.Description</p>
-                    <h4>Summary</h4>
-                    <p>@operation.Summary</p>
-
-                    <h4>Response Content Type</h4>
-                    if (operation.RequestBodies.Any())
+                    if (contentType?.Id != null)
                     {
-                        <table class="table table-bordered table-hover">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th scope="col">Content Type</th>
-                                    <th scope="col">Id</th>
-                                    <th scope="col">Type</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @{
-                                    var contentType = operation.RequestBodies?.SingleOrDefault(requestBody => requestBody.ContentType.Equals("application/json"));
-                                }
-                                <tr>
-                                    <td>@contentType?.ContentType</td>
-                                    <td><a href="#@contentType?.Id">@contentType?.Id</a></td>
-                                    <td>@contentType?.Type</td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        if (contentType?.Id != null)
-                        {
-                            <h4>Sample Request Body</h4>
-                            <div class="docs-code-block">
+                        <h4>Sample Request Body</h4>
+                        <div class="docs-code-block">
 <pre class="shadow-lg rounded">
-                                <code class="json hljs">
+<code class="json hljs">
  @contentType.Id.FormatJson(Model.Components)
 </code>
 </pre>
-                            </div>
-                        }
+                        </div>
                     }
-                    else
-                    {
-                        <p>application/json</p>
-                    }
-
-                    <h4>Responses</h4>
-                    <table class="table table-bordered table-hover">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th scope="col">Name</th>
-                                <th scope="col">Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var response in operation.Responses)
-                            {
-                                <tr>
-                                    <td>@response.Name</td>
-                                    <td>@response.Description</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-
-                    <h4>Parameters</h4>
-                    <table class="table table-bordered table-hover">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th scope="col">Name</th>
-                                <th scope="col">In</th>
-                                <th scope="col">Type</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Required</th>
-                                <th scope="col">Enums</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var parameter in operation.Parameters)
-                            {
-                                <tr>
-                                    <td>@parameter.Name</td>
-                                    <td>@parameter.In</td>
-                                    <td>@parameter.Type</td>
-                                    <td>@parameter.Description</td>
-                                    <td>@parameter.IsRequired</td>
-                                    <td>@string.Join(", ", parameter.Enumerations.Select(e => e.Value))</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
                 }
+                else
+                {
+                    <p>application/json</p>
+                }
+
+                <h4>Responses</h4>
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var response in operation.Responses)
+                        {
+                            <tr>
+                                <td>@response.Name</td>
+                                <td>@response.Description</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <h4>Parameters</h4>
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">In</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Required</th>
+                            <th scope="col">Enums</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var parameter in operation.Parameters)
+                        {
+                            <tr>
+                                <td>@parameter.Name</td>
+                                <td>@parameter.In</td>
+                                <td>@parameter.Type</td>
+                                <td>@parameter.Description</td>
+                                <td>@parameter.IsRequired</td>
+                                <td>@string.Join(", ", parameter.Enumerations.Select(e => e.Value))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             }
-            {
-                previous = current;
-            }
+
         }
     </div>
 </div>

@@ -45,7 +45,7 @@ namespace WebApiDocumentationLibrary
                 Operations = path.Value.Operations.Select(operation => new Operation
                 {
                     Method = operation.Key.ToString().ToLower(),
-                    OperationType = $"{path.Key}",
+                    Endpoint = $"{path.Key}",
                     Description = operation.Value.Description,
                     Summary = operation.Value.Summary,
                     Name = operation.Value.Tags[0].Name,
