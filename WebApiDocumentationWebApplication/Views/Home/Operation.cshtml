@@ -1,0 +1,21 @@
+﻿@model OperationViewModel
+
+<h4>Response Content Type</h4>
+
+<table class="table table-bordered table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Operation</th>
+            <th scope="col">View</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Operations)
+        {
+            <tr>
+                <td>@item</td>
+                <td><a asp-route-operation="@item" asp-action="Index" asp-controller="Operations">@item</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
