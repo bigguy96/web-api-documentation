@@ -1,21 +1,16 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using WebApiDocumentationLibrary;
 using WebApiDocumentationWebApplication.Models;
 
 namespace WebApiDocumentationWebApplication.Controllers
 {
     public class HomeController : BaseController
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger) : base(logger)
+        public HomeController()
         {
-            _logger = logger;
+           
         }
 
         public async Task<IActionResult> Index()

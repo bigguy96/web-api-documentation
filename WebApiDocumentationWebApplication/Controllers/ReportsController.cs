@@ -1,14 +1,13 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using WebApiDocumentationWebApplication.Models;
 
 namespace WebApiDocumentationWebApplication.Controllers
 {
     public class ReportsController : BaseController
     {
-        public ReportsController(ILogger<ReportsController> logger) : base(logger)
+        public ReportsController()
         {
 
         }
