@@ -1,0 +1,39 @@
+﻿@model SchemasViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <h1>@Model.WebApiTitle</h1>
+    <p><strong><a href="@Model.WebApiUrl">@Model.WebApiUrl</a></strong></p>
+
+    @foreach (var schema in Model.Schemas)
+    {
+        <h2 id="@schema.Name">@schema.Name</h2>
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Type</th>                    
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var property in schema.Properties)
+                {
+                    <tr>
+                        <td>@property.Name</td>
+                        <td>@property.Type</td>
+                    </tr>
+
+                    @if (!property.Enumerations.Any()) continue;
+
+                    <tr>
+                        <td>@string.Join(", ", property.Enumerations.Select(e => e.Value))</td>
+                        <td>String</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
