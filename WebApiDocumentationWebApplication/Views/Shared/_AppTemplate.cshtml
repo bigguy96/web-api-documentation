@@ -37,7 +37,31 @@
         var defTop = document.getElementById("def-top");
         defTop.outerHTML = wet.builder.appTop({
             "appName": [{ "text": "Application name", "href": "#" }],
-            "lngLinks": [{ "lang": "fr", "href": "apptop-fr.html", "text": "Français" }]
+            "lngLinks": [{ "lang": "fr", "href": "apptop-fr.html", "text": "Français" }],
+            "menuLinks": [{
+                "href": "/Home",
+                "text": "Home"
+            },
+            {
+                "href": "/Home/Operation",
+                "text": "Operation Groups"
+            },
+            {
+                "href": "/Reports/Description",
+                "text": "Missing Descriptions"
+            },
+            {
+                "href": "/Reports/Summary",
+                "text": "Missing Summaries"
+            },
+            {
+                "href": "/Reports/Parameters",
+                "text": "Missing Parameter Descriptions"
+            },
+            {
+                "href": "/Schemas",
+                "text": "Schemas"
+            }]
         });
     </script>
     <main role="main" property="mainContentOfPage" class="container">

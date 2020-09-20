@@ -4,27 +4,7 @@
     ViewData["Title"] = "Home Page";
 }
 
-@*<div id="docs-sidebar" class="docs-sidebar">
-        <nav id="docs-nav" class="docs-nav navbar">
-            <ul class="section-items list-unstyled nav flex-column pb-3">
-                @foreach (var paths in Model.Paths)
-                {
-                    @foreach (var operation in paths.Operations)
-                    {
-                        <li class="nav-item"><a class="nav-link scrollto" href="#">@operation.FullPath (@operation.Name)</a></li>
-                    }
-                }
-            </ul>
-        </nav>
-    </div>*@
-
 <div class="container">
-    <p><a asp-action="Operation">Operation Groups</a></p>
-    <p><a asp-action="Description" asp-controller="Reports">Missing Descriptions</a></p>
-    <p><a asp-action="Summary" asp-controller="Reports">Missing Summary</a></p>
-    <p><a asp-action="Parameters" asp-controller="Reports">Missing Parameter Descriptions</a></p>
-    <p><a asp-action="Index" asp-controller="Schemas">Schemas</a></p>
-
     <h1>@Model.WebApiTitle</h1>
     <p><strong><a href="@Model.WebApiUrl">@Model.WebApiUrl</a></strong></p>
 
