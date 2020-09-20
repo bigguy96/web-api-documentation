@@ -51,7 +51,12 @@ namespace WebApiDocumentationWebApplication.Controllers
                 }                
             }
 
-            return View(new OperationViewModel { Operations = list });
+            return View(new OperationViewModel 
+            { 
+                Operations = list,
+                WebApiTitle = openApiDocumentDetails.WebApiTitle,
+                WebApiUrl = openApiDocumentDetails.WebApiUrl
+            });
         }
     }
 }
