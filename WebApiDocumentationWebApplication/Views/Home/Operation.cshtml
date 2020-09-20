@@ -6,7 +6,7 @@
     <thead class="thead-dark">
         <tr>
             <th scope="col">Operation</th>
-            <th scope="col">View</th>
+            <th scope="col">Action</th>
         </tr>
     </thead>
     <tbody>
@@ -14,7 +14,7 @@
         {
             <tr>
                 <td>@item</td>
-                <td><a asp-route-operation="@item" asp-action="Index" asp-controller="Operations">@item</a></td>
+                <td><a asp-route-operation="@item" asp-action="Index" asp-controller="Operations">View</a></td>
             </tr>
         }
     </tbody>

@@ -1,0 +1,31 @@
+﻿@model ReportsViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <h1>@Model.WebApiTitle</h1>
+    <p><strong><a href="@Model.WebApiUrl">@Model.WebApiUrl</a></strong></p>
+
+    <h2>Missing Description</h2>
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Operation</th>
+                <th scope="col">Endpoint</th>
+                <th scope="col">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var operation in Model.Operations)
+            {
+                <tr>
+                    <td>@operation.Name</td>
+                    <td>@operation.FullPath</td>
+                    <td>@operation.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

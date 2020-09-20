@@ -18,9 +18,12 @@
         </nav>
     </div>*@
 
-<p><a asp-action="Operation">Operation Groups</a></p>
-
 <div class="container">
+    <p><a asp-action="Operation">Operation Groups</a></p>
+    <p><a asp-action="Description" asp-controller="Reports">Missing Descriptions</a></p>
+    <p><a asp-action="Summary" asp-controller="Reports">Missing Summary</a></p>
+    <p><a asp-action="Parameters" asp-controller="Reports">Missing Parameter Descriptions</a></p>
+
     <h1>@Model.WebApiTitle</h1>
     <p><strong><a href="@Model.WebApiUrl">@Model.WebApiUrl</a></strong></p>
 
