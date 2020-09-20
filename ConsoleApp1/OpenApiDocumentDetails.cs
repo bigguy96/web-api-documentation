@@ -60,7 +60,9 @@ namespace WebApiDocumentationLibrary
                     Responses = operation.Value.Responses.Select(response => new Response
                     {
                         Name = response.Key,
-                        Description = response.Value.Description
+                        Description = response.Value.Description,
+                        Properties = response.Value.Content.Select(kvp=> kvp.Value.Schema.Properties),
+                        References = response.Value.Content.Select(kvp => kvp.Value.Schema.Reference)
                     }),
                     Parameters = operation.Value.Parameters.Select(parameter => new Parameter
                     {
