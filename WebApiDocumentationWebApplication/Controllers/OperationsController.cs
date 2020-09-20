@@ -9,10 +9,12 @@ namespace WebApiDocumentationWebApplication.Controllers
     public class OperationsController : BaseController
     {
         private readonly IViewRenderService _viewRenderService;
+        private readonly IEmailService _emailService;
 
-        public OperationsController(IViewRenderService viewRenderService)
+        public OperationsController(IViewRenderService viewRenderService, IEmailService emailService)
         {
             _viewRenderService = viewRenderService;
+            _emailService = emailService;
         }
 
         public async Task<IActionResult> IndexAsync(string operation)
@@ -27,6 +29,9 @@ namespace WebApiDocumentationWebApplication.Controllers
                 WebApiUrl = openApiDocumentDetails.WebApiUrl
             };
             var result = await _viewRenderService.RenderToStringAsync("Operations/Index", vm);
+            await _emailService.SendAsync("noreply@fakemail.com", "test", "test", result);
+
+            //var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
             return View(vm);
         }
