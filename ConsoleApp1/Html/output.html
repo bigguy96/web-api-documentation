@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.2/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <style>
+        .badge-head {
+            color: #FFF;
+            background-color: #ffd20f;
+        }
+
+        .badge-get {
+            color: #FFF;
+            background-color: #0f6ab4
+        }
+
+        .badge-post {
+            color: #FFF;
+            background-color: #10a54a;
+        }
+
+        .badge-delete {
+            color: #FFF;
+            background-color: #a41e22;
+        }
+
+        .badge-put {
+            color: #FFF;
+            background-color: #c5862b;
+        }
+
+        .badge {
+            padding: 10px !important;
+            font-size: 1.5rem !important;
+        }
+
+
+        .table-light,
+        .table-light > th,
+        .table-light > td {
+            background-color: #fff
+        }
+
+            .table-light th,
+            .table-light td,
+            .table-light thead th,
+            .table-light tbody + tbody {
+                border-color: #fff
+            }
+
+        .table-hover .table-light:hover {
+            background-color: #f2f2f2
+        }
+
+            .table-hover .table-light:hover > td,
+            .table-hover .table-light:hover > th {
+                background-color: #f2f2f2
+            }
+
+        .table-dark,
+        .table-dark > th,
+        .table-dark > td {
+            background-color: #d8dbe1
+        }
+
+            .table-dark th,
+            .table-dark td,
+            .table-dark thead th,
+            .table-dark tbody + tbody {
+                border-color: #b7bdc7
+            }
+
+        .table-hover .table-dark:hover {
+            background-color: #caced6
+        }
+
+            .table-hover .table-dark:hover > td,
+            .table-hover .table-dark:hover > th {
+                background-color: #caced6
+            }
+
+        .table-active,
+        .table-active > th,
+        .table-active > td {
+            background-color: rgba(0, 0, 0, 0.075)
+        }
+
+        .table-hover .table-active:hover {
+            background-color: rgba(0, 0, 0, 0.075)
+        }
+
+            .table-hover .table-active:hover > td,
+            .table-hover .table-active:hover > th {
+                background-color: rgba(0, 0, 0, 0.075)
+            }
+
+        .table .thead-dark th {
+            color: #fff;
+            background-color: #747f94;
+            border-color: #8993a4
+        }
+
+        .table .thead-light th {
+            color: #919aaa;
+            background-color: #f5f6f8;
+            border-color: #e7e9ed
+        }
+
+        .table-dark {
+            color: #fff;
+            background-color: #747f94
+        }
+
+            .table-dark th,
+            .table-dark td,
+            .table-dark thead th {
+                border-color: #8993a4
+            }
+
+            .table-dark.table-bordered {
+                border: 0
+            }
+
+            .table-dark.table-striped tbody tr:nth-of-type(odd) {
+                background-color: rgba(255, 255, 255, 0.05)
+            }
+
+            .table-dark.table-hover tbody tr:hover {
+                color: #fff;
+                background-color: rgba(255, 255, 255, 0.075)
+            }
+    </style>
+</head>
+
+<body>
+    <div class="container">        
+       {content}        
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+    <script>
+        hljs.initHighlighting();
+    </script>
+</body>
+</html>
