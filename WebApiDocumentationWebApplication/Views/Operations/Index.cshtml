@@ -8,8 +8,7 @@
     <h1>@Model.WebApiTitle</h1>
     <p><strong><a href="@Model.WebApiUrl">@Model.WebApiUrl</a></strong></p>
 
-   
-        @foreach (var operation in Model.Operations)
+    @foreach (var operation in Model.Operations)
         {
             <h2>@operation.Name</h2>
             <h3><span class="badge @operation.GetBadge()">@operation.FullPath</span></h3>

@@ -1,0 +1,21 @@
+﻿@model SearchViewModel
+
+@{
+    ViewBag.Title = "title";
+}
+
+<div class="container">
+    <h1>@Model.WebApiTitle</h1>
+    <p><strong><a href="@Model.WebApiUrl">@Model.WebApiUrl</a></strong></p>
+
+    <h2>Search by endpoint</h2>
+
+    <form asp-controller="Operations" asp-action="Search" method="post">
+        <div class="form-group">
+            <label asp-for="Endpoint"></label>
+            <input type="text" asp-for="Endpoint" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+</div>
