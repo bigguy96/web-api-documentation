@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml;
+﻿using System;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using HtmlToOpenXml;
@@ -10,32 +11,31 @@ namespace WordDocumentGenerator
     {
         public void Generate(string content)
         {
+            var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             const string filename = "test.docx";
-            string html = content;
+            var html = content;
 
             if (File.Exists(filename)) File.Delete(filename);
 
-            using (MemoryStream generatedDocument = new MemoryStream())
+            using var generatedDocument = new MemoryStream();
+            using (var package = WordprocessingDocument.Create(generatedDocument, WordprocessingDocumentType.Document))
             {
-                using (WordprocessingDocument package = WordprocessingDocument.Create(generatedDocument, WordprocessingDocumentType.Document))
+                var mainPart = package.MainDocumentPart;
+                if (mainPart == null)
                 {
-                    MainDocumentPart mainPart = package.MainDocumentPart;
-                    if (mainPart == null)
-                    {
-                        mainPart = package.AddMainDocumentPart();
-                        new Document(new Body()).Save(mainPart);
-                    }
-
-                    HtmlConverter converter = new HtmlConverter(mainPart);
-                    converter.ParseHtml(html);
-
-                    mainPart.Document.Save();
+                    mainPart = package.AddMainDocumentPart();
+                    new Document(new Body()).Save(mainPart);
                 }
 
-                File.WriteAllBytes(filename, generatedDocument.ToArray());
+                var converter = new HtmlConverter(mainPart);
+                converter.ParseHtml(html);
+
+                mainPart.Document.Save();
             }
 
-            System.Diagnostics.Process.Start(filename);
+            File.WriteAllBytes(Path.Combine(myDocuments, filename), generatedDocument.ToArray());
+
+            //System.Diagnostics.Process.Start(filename);
         }
     }
 }

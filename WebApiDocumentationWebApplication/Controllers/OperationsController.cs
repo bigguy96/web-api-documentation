@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WebApiDocumentationWebApplication.Models;
 using WebApiDocumentationWebApplication.Utilities;
+using WordDocumentGenerator;
 
 namespace WebApiDocumentationWebApplication.Controllers
 {
@@ -29,10 +31,14 @@ namespace WebApiDocumentationWebApplication.Controllers
                 WebApiTitle = openApiDocumentDetails.WebApiTitle,
                 WebApiUrl = openApiDocumentDetails.WebApiUrl
             };
-            
+
             //var result = await _viewRenderService.RenderToStringAsync("Operations/Index", vm);
-            //await _emailService.SendAsync("noreply@fakemail.com", "test", "test", result);
-            //var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            //var content = await System.IO.File.ReadAllTextAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),"template", "output.html"));
+
+            //content = content.Replace("{content}", result);
+            //await _emailService.SendAsync("noreply@fakemail.com", "test", "test", content);
+
+            //new WordGenerator().Generate(content);
 
             return View(vm);
         }
