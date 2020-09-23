@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,6 +42,52 @@ namespace WebApiDocumentationWebApplication.Controllers
             //new WordGenerator().Generate(content);
 
             return View(vm);
+        }
+
+        public async Task<IActionResult> List()
+        {
+            var openApiDocumentDetails = await GetApiDocumentDetailsAsync();
+            var pathGroupings = openApiDocumentDetails.Paths.Select(path => path.Operations.GroupBy(operation => operation.Name));
+
+            var vm = new HomeViewModel
+            {
+                Paths = openApiDocumentDetails.Paths,
+                Components = openApiDocumentDetails.Components,
+                WebApiTitle = openApiDocumentDetails.WebApiTitle,
+                WebApiUrl = openApiDocumentDetails.WebApiUrl
+            };
+
+            return View(vm);
+        }
+
+        public async Task<IActionResult> Groups()
+        {
+            var openApiDocumentDetails = await GetApiDocumentDetailsAsync();
+            var pathGroupings = openApiDocumentDetails.Paths.Select(path => path.Operations.Select(x => new { x.Name })).Distinct();
+            var list = new List<string>();
+            var current = string.Empty;
+            var previous = string.Empty;
+
+            foreach (var item in pathGroupings)
+            {
+                foreach (var item1 in item)
+                {
+                    current = item1.Name;
+
+                    if (!current.Equals(previous))
+                    {
+                        list.Add(item1.Name);
+                    }
+                    previous = current;
+                }
+            }
+
+            return View(new OperationViewModel
+            {
+                Operations = list,
+                WebApiTitle = openApiDocumentDetails.WebApiTitle,
+                WebApiUrl = openApiDocumentDetails.WebApiUrl
+            });
         }
 
         public async Task<IActionResult> Result(string endpoint)
