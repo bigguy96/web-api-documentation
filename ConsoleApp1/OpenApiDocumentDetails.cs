@@ -98,3 +98,5 @@ namespace WebApiDocumentationLibrary
         }
     }
 }
+
+//https://github.com/microsoft/OpenAPI.NET/blob/vnext/README.md
