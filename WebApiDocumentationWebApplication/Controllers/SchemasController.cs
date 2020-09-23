@@ -9,7 +9,7 @@ namespace WebApiDocumentationWebApplication.Controllers
         public async Task<IActionResult> Index()
         {
             var openApiDocumentDetails = await GetApiDocumentDetailsAsync();            
-            var vm = new SchemasViewModel
+            var vm = new BaseViewModel
             {
                 Schemas = openApiDocumentDetails.Schemas,
                 WebApiTitle = openApiDocumentDetails.WebApiTitle,

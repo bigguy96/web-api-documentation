@@ -1,9 +1,7 @@
 ﻿namespace WebApiDocumentationWebApplication.Models
 {
-    public class SearchViewModel
+    public class SearchViewModel : BaseViewModel
     {
-        public string Endpoint { get; set; }
-        public string WebApiTitle { get; set; }
-        public string WebApiUrl { get; set; }
+        public string Endpoint { get; set; }        
     }
 }

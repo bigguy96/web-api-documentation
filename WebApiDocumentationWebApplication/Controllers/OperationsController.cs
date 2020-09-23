@@ -25,7 +25,7 @@ namespace WebApiDocumentationWebApplication.Controllers
         {
             var openApiDocumentDetails = await GetApiDocumentDetailsAsync();
             var operations = openApiDocumentDetails.Paths.SelectMany(path => path.Operations.Where(o => o.Name.Equals(operation)));
-            var vm = new OperationsViewModel
+            var vm = new BaseViewModel
             {
                 Operations = operations,
                 Components = openApiDocumentDetails.Components,
@@ -49,7 +49,7 @@ namespace WebApiDocumentationWebApplication.Controllers
             var openApiDocumentDetails = await GetApiDocumentDetailsAsync();
             var pathGroupings = openApiDocumentDetails.Paths.Select(path => path.Operations.GroupBy(operation => operation.Name));
 
-            var vm = new HomeViewModel
+            var vm = new BaseViewModel
             {
                 Paths = openApiDocumentDetails.Paths,
                 Components = openApiDocumentDetails.Components,
@@ -84,7 +84,7 @@ namespace WebApiDocumentationWebApplication.Controllers
 
             return View(new OperationViewModel
             {
-                Operations = list,
+                ApiGroups = list,
                 WebApiTitle = openApiDocumentDetails.WebApiTitle,
                 WebApiUrl = openApiDocumentDetails.WebApiUrl
             });
@@ -94,7 +94,7 @@ namespace WebApiDocumentationWebApplication.Controllers
         {
             var openApiDocumentDetails = await GetApiDocumentDetailsAsync();
             var operations = openApiDocumentDetails.Paths.SelectMany(path => path.Operations.Where(o => o.Endpoint.Equals(endpoint, StringComparison.OrdinalIgnoreCase)));
-            var vm = new OperationsViewModel
+            var vm = new BaseViewModel
             {
                 Operations = operations,
                 Components = openApiDocumentDetails.Components,

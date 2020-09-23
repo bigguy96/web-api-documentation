@@ -4,11 +4,13 @@ using WebApiDocumentationLibrary.Entities;
 
 namespace WebApiDocumentationWebApplication.Models
 {
-    public class ReportsViewModel
+    public class BaseViewModel
     {
-        public IEnumerable<Operation> Operations { get; set; }
         public string WebApiTitle { get; internal set; }
         public string WebApiUrl { get; internal set; }
+        public IEnumerable<Paths> Paths { get; set; }
+        public IEnumerable<Operation> Operations { get; set; }
         public OpenApiComponents Components { get; internal set; }
+        public IEnumerable<Schema> Schemas { get; internal set; }
     }
 }

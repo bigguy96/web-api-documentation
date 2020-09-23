@@ -7,17 +7,12 @@ namespace WebApiDocumentationWebApplication.Controllers
 {
     public class ReportsController : BaseController
     {
-        public ReportsController()
-        {
-
-        }
-
         public async Task<IActionResult> Description()
         {
             var openApiDocumentDetails = await GetApiDocumentDetailsAsync();
             var operations = openApiDocumentDetails.Paths.SelectMany(path => path.Operations.Where(o => string.IsNullOrWhiteSpace(o.Description)));
 
-            return View(new ReportsViewModel
+            return View(new BaseViewModel
             {
                 Operations = operations,
                 Components = openApiDocumentDetails.Components,
@@ -31,7 +26,7 @@ namespace WebApiDocumentationWebApplication.Controllers
             var openApiDocumentDetails = await GetApiDocumentDetailsAsync();
             var operations = openApiDocumentDetails.Paths.SelectMany(path => path.Operations.Where(o => string.IsNullOrWhiteSpace(o.Summary)));
 
-            return View(new ReportsViewModel
+            return View(new BaseViewModel
             {
                 Operations = operations,
                 Components = openApiDocumentDetails.Components,
@@ -46,7 +41,7 @@ namespace WebApiDocumentationWebApplication.Controllers
             var operations = openApiDocumentDetails.Paths
                 .SelectMany(path => path.Operations.Where(o => o.Parameters.Any(w => string.IsNullOrWhiteSpace(w.Description) && !w.Name.Equals("app-jwt"))));
 
-            return View(new ReportsViewModel
+            return View(new BaseViewModel
             {
                 Operations = operations,
                 Components = openApiDocumentDetails.Components,

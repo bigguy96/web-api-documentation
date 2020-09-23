@@ -1,14 +1,14 @@
-﻿@model ReportsViewModel
+﻿@model BaseViewModel
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Missing Parameters Descriptions";
 }
 
 <div class="container">
     <h1>@Model.WebApiTitle</h1>
     <p><strong><a href="@Model.WebApiUrl">@Model.WebApiUrl</a></strong></p>
 
-    <h2>Missing Summaries</h2>
+    <h2>Missing Parameters Descriptions</h2>
     <hr />
 
     @foreach (var operation in Model.Operations)
