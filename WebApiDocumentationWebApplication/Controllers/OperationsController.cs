@@ -24,7 +24,7 @@ namespace WebApiDocumentationWebApplication.Controllers
         public async Task<IActionResult> Index(string operation)
         {
             var openApiDocumentDetails = await GetApiDocumentDetailsAsync();
-            var operations = openApiDocumentDetails.Paths.SelectMany(path => path.Operations.Where(o => o.Name.Equals(operation)));
+            var operations = openApiDocumentDetails.Paths.SelectMany(path => path.Operations.Where(o => o.Name.Equals(operation))).ToList();
             var vm = new BaseViewModel
             {
                 Operations = operations,
@@ -39,7 +39,13 @@ namespace WebApiDocumentationWebApplication.Controllers
             //content = content.Replace("{content}", result);
             //await _emailService.SendAsync("noreply@fakemail.com", "test", "test", content);
 
-            //new WordGenerator().Generate(content);
+            new WordGenerator().Generate(new ApiDetails
+            {
+                Operations = operations,
+                Components = openApiDocumentDetails.Components,
+                WebApiTitle = openApiDocumentDetails.WebApiTitle,
+                WebApiUrl = openApiDocumentDetails.WebApiUrl
+            });
 
             return View(vm);
         }
@@ -65,14 +71,13 @@ namespace WebApiDocumentationWebApplication.Controllers
             var openApiDocumentDetails = await GetApiDocumentDetailsAsync();
             var pathGroupings = openApiDocumentDetails.Paths.Select(path => path.Operations.Select(x => new { x.Name })).Distinct();
             var list = new List<string>();
-            var current = string.Empty;
             var previous = string.Empty;
 
             foreach (var item in pathGroupings)
             {
                 foreach (var item1 in item)
                 {
-                    current = item1.Name;
+                    var current = item1.Name;
 
                     if (!current.Equals(previous))
                     {
