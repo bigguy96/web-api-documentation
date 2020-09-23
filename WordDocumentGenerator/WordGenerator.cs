@@ -4,6 +4,8 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using HtmlToOpenXml;
 using System.IO;
+using System.Linq;
+using WebApiDocumentationLibrary.Extensions;
 
 namespace WordDocumentGenerator
 {
@@ -40,6 +42,8 @@ namespace WordDocumentGenerator
             //System.Diagnostics.Process.Start(filename);
         }
 
+        
+        //TODO: Look a cloning document and replace text.
         public void Generate(ApiDetails apiDetails)
         {
             var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -67,6 +71,120 @@ namespace WordDocumentGenerator
                 AddParagraph("Summary");
                 AddParagraph(operation.Summary);
 
+                AddParagraph("Response Content Type");
+                if (operation.RequestBodies.Any())
+                {
+                    var contentType = operation.RequestBodies?.SingleOrDefault(requestBody => requestBody.ContentType.Equals("application/json"));
+                    var tbl = CreateTable();
+                    var tr = new TableRow();
+                    var contentTypeCell = new TableCell();
+                    var idCell = new TableCell();
+                    var typeCell = new TableCell();
+
+                    //TableWidth width = table.GetDescendents<TableWidth>().First();
+                    //width.Width = "5000";
+                    //width.Type = TableWidthUnitValues.Pct;
+
+                    contentTypeCell.Append(new Paragraph(new Run(new Text("Content Type"))));
+                    idCell.Append(new Paragraph(new Run(new Text("Id"))));
+                    typeCell.Append(new Paragraph(new Run(new Text("Type"))));
+
+                    tr.Append(contentTypeCell);
+                    tr.Append(idCell);
+                    tr.Append(typeCell);
+
+                    tr = new TableRow();
+                    contentTypeCell = new TableCell();
+                    idCell = new TableCell();
+                    typeCell = new TableCell();
+
+                    contentTypeCell.Append(new Paragraph(new Run(new Text(contentType?.ContentType))));
+                    idCell.Append(new Paragraph(new Run(new Text(contentType?.Id))));
+                    typeCell.Append(new Paragraph(new Run(new Text(contentType?.Type))));
+
+                    tr.Append(contentTypeCell);
+                    tr.Append(idCell);
+                    tr.Append(typeCell);
+
+                    tbl.Append(tr);
+
+                    _body.Append(tbl);
+
+                    if (contentType?.Id != null)
+                    {
+                        AddParagraph("Sample Request Body");
+                        AddParagraph(contentType.Id.FormatJson(apiDetails.Components));
+                    }
+                    else
+                    {
+                        AddParagraph("application/json");
+                    }
+                }
+
+                //        < h4 > Responses </ h4 >
+                //        < table class= "table table-bordered table-hover" >
+
+                //             < thead class= "thead-dark" >
+
+                //                  < tr >
+
+                //                      < th scope = "col" > Name </ th >
+
+                //                       < th scope = "col" > Description </ th >
+
+                //                    </ tr >
+
+                //                </ thead >
+
+                //                < tbody >
+                //                    @foreach(var response in operation.Responses)
+                //                {
+                //                    < tr >
+                //                        < td > @response.Name </ td >
+                //                        < td > @response.Description </ td >
+                //                    </ tr >
+                //                }
+                //            </ tbody >
+                //        </ table >
+
+                //        < h4 > Parameters </ h4 >
+                //        < table class= "table table-bordered table-hover" >
+
+                //             < thead class= "thead-dark" >
+
+                //                  < tr >
+
+                //                      < th scope = "col" > Name </ th >
+
+                //                       < th scope = "col" > In </ th >
+
+                //                        < th scope = "col" > Type </ th >
+
+                //                         < th scope = "col" > Description </ th >
+
+                //                          < th scope = "col" > Required </ th >
+
+                //                           < th scope = "col" > Enums </ th >
+
+                //                        </ tr >
+
+                //                    </ thead >
+
+                //                    < tbody >
+                //                        @foreach(var parameter in operation.Parameters)
+                //                {
+                //                    < tr >
+                //                        < td > @parameter.Name </ td >
+                //                        < td > @parameter.In </ td >
+                //                        < td > @parameter.Type </ td >
+                //                        < td > @parameter.Description </ td >
+                //                        < td > @parameter.IsRequired </ td >
+                //                        < td > @string.Join(", ", parameter.Enumerations.Select(e => e.Value)) </ td >
+                //                    </ tr >
+                //                }
+                //            </ tbody >
+                //        </ table >
+
 
             }
 
@@ -74,6 +192,65 @@ namespace WordDocumentGenerator
 
             document.Save();
             //Process.Start(fileName);
+        }
+
+        private Table CreateTable()
+        {
+            //Create table
+            var tbl = new Table();
+
+            //Create the table properties
+            var tblProperties = new TableProperties();
+
+            //Create Table Borders
+            var tblBorders = new TableBorders();
+
+            var topBorder = new TopBorder
+            {
+                Val = new EnumValue<BorderValues>(BorderValues.Thick),
+                Color = "000000"
+            };
+            tblBorders.AppendChild(topBorder);
+
+            var bottomBorder = new BottomBorder
+            {
+                Val = new EnumValue<BorderValues>(BorderValues.Thick),
+                Color = "000000"
+            };
+            tblBorders.AppendChild(bottomBorder);
+
+            var rightBorder = new RightBorder
+            {
+                Val = new EnumValue<BorderValues>(BorderValues.Thick),
+                Color = "000000"
+            };
+            tblBorders.AppendChild(rightBorder);
+
+            var leftBorder = new LeftBorder
+            {
+                Val = new EnumValue<BorderValues>(BorderValues.Thick),
+                Color = "000000"
+            };
+            tblBorders.AppendChild(leftBorder);
+
+            var insideHBorder = new InsideHorizontalBorder
+            {
+                Val = new EnumValue<BorderValues>(BorderValues.Thick),
+                Color = "000000"
+            };
+            tblBorders.AppendChild(insideHBorder);
+
+            var insideVBorder = new InsideVerticalBorder
+            {
+                Val = new EnumValue<BorderValues>(BorderValues.Thick),
+                Color = "000000"
+            };
+
+            tblBorders.AppendChild(insideVBorder);
+            tblProperties.AppendChild(tblBorders);
+            tbl.AppendChild(tblProperties);
+
+            return tbl;
         }
 
         private void AddTable()
