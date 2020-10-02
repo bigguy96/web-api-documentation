@@ -1,0 +1,5 @@
+﻿https://stackoverflow.com/questions/37839771/how-to-retrieve-specific-element-from-open-xml-word-document-mainpart
+
+https://stackoverflow.com/questions/18316873/replace-text-in-word-document-using-open-xml
+
+http://www.ludovicperrichon.com/create-a-word-document-with-openxml-and-c/#heading
