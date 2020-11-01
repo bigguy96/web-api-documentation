@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApiDocumentation", "ConsoleApp1\WebApiDocumentation.csproj", "{31137267-7E56-42A4-AD04-2D8C5F51ECA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApiDocumentation", "WebApiDocumentation\WebApiDocumentation.csproj", "{31137267-7E56-42A4-AD04-2D8C5F51ECA4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApiDocumentationWebApplication", "WebApiDocumentationWebApplication\WebApiDocumentationWebApplication.csproj", "{E873D3CC-9FBF-4E5A-A854-2F3A423A4E76}"
 	ProjectSection(ProjectDependencies) = postProject
