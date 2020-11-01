@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleApp1\WebApiDocumentation.csproj" />
+    <ProjectReference Include="..\WebApiDocumentation\WebApiDocumentation.csproj" />
     <ProjectReference Include="..\WordDocumentGenerator\WordDocumentGenerator.csproj" />
   </ItemGroup>
 

@@ -39,13 +39,13 @@ namespace WebApiDocumentationWebApplication.Controllers
             //content = content.Replace("{content}", result);
             //await _emailService.SendAsync("noreply@fakemail.com", "test", "test", content);
 
-            new WordGenerator().Generate(new ApiDetails
-            {
-                Operations = operations,
-                Components = openApiDocumentDetails.Components,
-                WebApiTitle = openApiDocumentDetails.WebApiTitle,
-                WebApiUrl = openApiDocumentDetails.WebApiUrl
-            });
+            //new WordGenerator().Generate(new ApiDetails
+            //{
+            //    Operations = operations,
+            //    Components = openApiDocumentDetails.Components,
+            //    WebApiTitle = openApiDocumentDetails.WebApiTitle,
+            //    WebApiUrl = openApiDocumentDetails.WebApiUrl
+            //});
 
             return View(vm);
         }

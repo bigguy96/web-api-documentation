@@ -6,8 +6,9 @@
 }
 
 <div class="container">
-    <h1>@Model.WebApiTitle</h1>
-    <p><strong><a href="@Model.WebApiUrl">@Model.WebApiUrl</a></strong></p>
+    @{
+        await Html.RenderPartialAsync("_WebApiTitle", Model);
+    }
 
     @foreach (var operation in Model.Operations)
     {
@@ -45,7 +46,7 @@
             {
                 <h4>Sample Request Body</h4>
                 <div class="docs-code-block">
-<pre class="shadow-lg rounded">
+                    <pre class="shadow-lg rounded">
 <code class="json hljs">
  @contentType.Id.FormatJson(Model.Components)
 </code>

@@ -5,8 +5,9 @@
 }
 
 <div class="container">
-    <h1>@Model.WebApiTitle</h1>
-    <p><strong><a href="@Model.WebApiUrl">@Model.WebApiUrl</a></strong></p>
+    @{
+        await Html.RenderPartialAsync("_WebApiTitle", Model);
+    }
 
     @foreach (var schema in Model.Schemas)
     {

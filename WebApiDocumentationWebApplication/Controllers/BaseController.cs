@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WebApiDocumentation;
-using WebApiDocumentationLibrary;
 
 namespace WebApiDocumentationWebApplication.Controllers
 {
