@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using WebApiDocumentationLibrary.Entities;
+using WebApiDocumentation.Entities;
 
 namespace WebApiDocumentationWebApplication.Extensions
 {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.OpenApi.Models;
-using WebApiDocumentationLibrary.Entities;
+using WebApiDocumentation.Entities;
 
 namespace WordDocumentGenerator
 {

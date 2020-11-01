@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleApp1\WebApiDocumentationLibrary.csproj" />
+    <ProjectReference Include="..\ConsoleApp1\WebApiDocumentation.csproj" />
   </ItemGroup>
 
 </Project>

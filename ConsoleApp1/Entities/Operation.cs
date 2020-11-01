@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace WebApiDocumentationLibrary.Entities
+namespace WebApiDocumentation.Entities
 {
     public class Operation
     {

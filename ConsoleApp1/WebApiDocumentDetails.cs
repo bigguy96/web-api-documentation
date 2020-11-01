@@ -2,11 +2,11 @@
 using System.Linq;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
-using WebApiDocumentationLibrary.Entities;
+using WebApiDocumentation.Entities;
 
-namespace WebApiDocumentationLibrary
+namespace WebApiDocumentation
 {
-    public class OpenApiDocumentDetails
+    public class WebApiDocumentDetails
     {
         private readonly OpenApiDocument _openApiDocument;
 
@@ -16,7 +16,7 @@ namespace WebApiDocumentationLibrary
         public OpenApiComponents Components { get; private set; }
         public IEnumerable<Schema> Schemas { get; private set; }
 
-        public OpenApiDocumentDetails(OpenApiDocument openApiDocument)
+        public WebApiDocumentDetails(OpenApiDocument openApiDocument)
         {
             _openApiDocument = openApiDocument;
 

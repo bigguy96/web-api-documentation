@@ -5,7 +5,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using HtmlToOpenXml;
 using System.IO;
 using System.Linq;
-using WebApiDocumentationLibrary.Extensions;
+using WebApiDocumentation.Extensions;
 
 namespace WordDocumentGenerator
 {

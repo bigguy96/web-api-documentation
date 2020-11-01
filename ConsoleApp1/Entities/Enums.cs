@@ -1,4 +1,4 @@
-﻿namespace WebApiDocumentationLibrary.Entities
+﻿namespace WebApiDocumentation.Entities
 {
     public class Enums
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.OpenApi.Models;
 
-namespace WebApiDocumentationLibrary.Entities
+namespace WebApiDocumentation.Entities
 {
     public class Parameter
     {

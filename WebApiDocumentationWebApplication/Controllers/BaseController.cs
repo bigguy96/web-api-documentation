@@ -1,14 +1,15 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using WebApiDocumentation;
 using WebApiDocumentationLibrary;
 
 namespace WebApiDocumentationWebApplication.Controllers
 {
     public class BaseController : Controller
     {
-        protected async Task<OpenApiDocumentDetails> GetApiDocumentDetailsAsync()
+        protected async Task<WebApiDocumentDetails> GetApiDocumentDetailsAsync()
         {
-            var openApiDocumentDetails = await OpenApiDocumentHelper.CreateAsync();
+            var openApiDocumentDetails = await WebApiDocumentHelper.CreateAsync();
             
             return openApiDocumentDetails;
         }

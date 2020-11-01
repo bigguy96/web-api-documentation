@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
-using WebApiDocumentationLibrary.Entities;
+using WebApiDocumentation.Entities;
 
 namespace WebApiDocumentationWebApplication.Models
 {

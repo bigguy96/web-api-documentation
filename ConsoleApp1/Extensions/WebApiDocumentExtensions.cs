@@ -1,13 +1,13 @@
-﻿using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace WebApiDocumentationLibrary.Extensions
+namespace WebApiDocumentation.Extensions
 {
-    public static class OpenApiDocumentExtensions
+    public static class WebApiDocumentExtensions
     {
         private static StringBuilder _json;
         private static OpenApiComponents _openApiComponents;
