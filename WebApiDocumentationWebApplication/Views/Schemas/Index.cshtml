@@ -27,7 +27,10 @@
                         <td>@property.Type</td>
                     </tr>
 
-                    @if (!property.Enumerations.Any()) continue;
+                    @if (!property.Enumerations.Any())
+                    {
+                        continue;
+                    }
 
                     <tr>
                         <td>@string.Join(", ", property.Enumerations.Select(e => e.Value))</td>
