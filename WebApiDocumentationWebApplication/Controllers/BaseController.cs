@@ -8,9 +8,8 @@ namespace WebApiDocumentationWebApplication.Controllers
     {
         protected async Task<OpenApiDocumentDetails> GetApiDocumentDetailsAsync()
         {
-            var openApiDocument = await OpenApiDocumentHelper.CreateAsync();
-            var openApiDocumentDetails = new OpenApiDocumentDetails(openApiDocument);
-
+            var openApiDocumentDetails = await OpenApiDocumentHelper.CreateAsync();
+            
             return openApiDocumentDetails;
         }
     }
