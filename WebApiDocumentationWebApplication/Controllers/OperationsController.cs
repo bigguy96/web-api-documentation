@@ -53,7 +53,7 @@ namespace WebApiDocumentationWebApplication.Controllers
         public async Task<IActionResult> List()
         {
             var openApiDocumentDetails = await GetApiDocumentDetailsAsync();
-            var pathGroupings = openApiDocumentDetails.Paths.Select(path => path.Operations.GroupBy(operation => operation.Name));
+            //var pathGroupings = openApiDocumentDetails.Paths.Select(path => path.Operations.GroupBy(operation => operation.Name));
 
             var vm = new BaseViewModel
             {
