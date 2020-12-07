@@ -1,0 +1,152 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
+
+public class WordData
+{
+    /// <summary>
+    /// Create word document using exported data.
+    /// </summary>
+    public static void CreateDocument(IEnumerable<IGrouping<string, Output>> output)
+    {
+        const string fileName = @"c:\temp\DbSpecTest.docx";
+
+        using (var document = WordprocessingDocument.Open(fileName, true))
+        {
+            var doc = document.MainDocumentPart.Document;
+
+            //var sDParts = document.MainDocumentPart.GetPartsOfType<StyleDefinitionsPart>();
+            //foreach (var style in sDParts.First().Styles.ChildElements.OfType<Style>())
+            //{
+            //    Console.WriteLine("Style id: {0}, style name: {1}",
+            //        style.StyleId,
+            //        style.StyleName.Val);
+            //}
+
+            //Get table name and description
+            foreach (var tb in output)
+            {
+                string[] values = tb.Key.Split('|');
+                string tableName = values[0] + "\n\n\n";
+                string tableDescription = values[1] + "\n\n\n";
+
+                //Table name
+                Paragraph tableNamePara = doc.Body.AppendChild(new Paragraph());
+                Run run = tableNamePara.AppendChild(new Run());
+                run.AppendChild(new Text(tableName));
+                tableNamePara.ParagraphProperties = new ParagraphProperties(new ParagraphStyleId() {Val = "Heading3"});
+
+                //Table description
+                Paragraph tableDescriptionPara = doc.Body.AppendChild(new Paragraph());
+                Run tableDescriptionRun = tableDescriptionPara.AppendChild(new Run());
+                tableDescriptionRun.AppendChild(new Text(tableDescription));
+
+                //Table constraints
+                Paragraph constraintsPara = doc.Body.AppendChild(new Paragraph());
+                Run constraintsRun = constraintsPara.AppendChild(new Run());
+                constraintsRun.AppendChild(new Text("Constraints\n\n\n"));
+                constraintsPara.ParagraphProperties = new ParagraphProperties(new ParagraphStyleId() { Val = "Heading4" });
+
+                //Structural Changes
+                Paragraph structuralPara = doc.Body.AppendChild(new Paragraph());
+                Run structuralRun = structuralPara.AppendChild(new Run());
+                structuralRun.AppendChild(new Text("Structural Changes\n\n\n"));
+                structuralPara.ParagraphProperties = new ParagraphProperties(new ParagraphStyleId() { Val = "Heading4" });
+
+                //Create table
+                Table tbl = new Table();
+                Table tblMain = doc.Body.Elements<Table>().FirstOrDefault();
+                Table tblNew = (Table)tblMain.CloneNode(true);
+
+                TableRow row = tblNew.Elements<TableRow>().FirstOrDefault();
+                TableRow newRow = (TableRow)row.CloneNode(true);
+
+                tbl.Append(newRow);
+
+                //// Create the table properties
+                TableProperties tblProperties = new TableProperties();
+
+                //// Create Table Borders
+                TableBorders tblBorders = new TableBorders();
+
+                TopBorder topBorder = new TopBorder();
+                topBorder.Val = new EnumValue<BorderValues>(BorderValues.Thick);
+                topBorder.Color = "000000";
+                tblBorders.AppendChild(topBorder);
+
+                BottomBorder bottomBorder = new BottomBorder();
+                bottomBorder.Val = new EnumValue<BorderValues>(BorderValues.Thick);
+                bottomBorder.Color = "000000";
+                tblBorders.AppendChild(bottomBorder);
+
+                RightBorder rightBorder = new RightBorder();
+                rightBorder.Val = new EnumValue<BorderValues>(BorderValues.Thick);
+                rightBorder.Color = "000000";
+                tblBorders.AppendChild(rightBorder);
+
+                LeftBorder leftBorder = new LeftBorder();
+                leftBorder.Val = new EnumValue<BorderValues>(BorderValues.Thick);
+                leftBorder.Color = "000000";
+                tblBorders.AppendChild(leftBorder);
+
+                InsideHorizontalBorder insideHBorder = new InsideHorizontalBorder();
+                insideHBorder.Val = new EnumValue<BorderValues>(BorderValues.Thick);
+                insideHBorder.Color = "000000";
+                tblBorders.AppendChild(insideHBorder);
+
+                InsideVerticalBorder insideVBorder = new InsideVerticalBorder();
+                insideVBorder.Val = new EnumValue<BorderValues>(BorderValues.Thick);
+                insideVBorder.Color = "000000";
+
+                tblBorders.AppendChild(insideVBorder);
+
+                //// Add the table borders to the properties
+                tblProperties.AppendChild(tblBorders);
+
+                //// Add the table properties to the table
+                tbl.AppendChild(tblProperties);
+
+                //Get table column information
+                foreach (var ci in tb)
+                {
+                    var tr = new TableRow();
+                    var nameCell = new TableCell();
+                    var dbTypeCell = new TableCell();
+                    var isForeignKeyCell = new TableCell();
+                    var isPrimaryKeyCell = new TableCell();
+                    var isNullableCell = new TableCell();
+                    var descriptionCell = new TableCell();
+
+                    nameCell.Append(new Paragraph(new Run(new Text(ci.ColumnName))));
+                    dbTypeCell.Append(new Paragraph(new Run(new Text(ci.DataType))));
+                    isForeignKeyCell.Append(new Paragraph(new Run(new Text(ci.ForeignKeyInformation))));
+                    isPrimaryKeyCell.Append(new Paragraph(new Run(new Text(ci.IsPrimaryKey))));
+                    isNullableCell.Append(new Paragraph(new Run(new Text(ci.IsNullable))));
+                    descriptionCell.Append(new Paragraph(new Run(new Text(ci.ColumnDescription))));
+
+                    tr.Append(nameCell);
+                    tr.Append(dbTypeCell);
+                    tr.Append(isPrimaryKeyCell);
+                    tr.Append(isForeignKeyCell);
+                    tr.Append(isNullableCell);
+                    tr.Append(descriptionCell);
+
+                    tbl.Append(tr);
+
+                }
+                
+                //Add table to document
+                doc.Body.Append(tbl);
+            }
+
+            //Save document
+            doc.Save();
+
+            Process.Start(fileName);
+        }
+    }
+}

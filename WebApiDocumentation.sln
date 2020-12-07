@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApiDocumentation", "WebApiDocumentation\WebApiDocumentation.csproj", "{31137267-7E56-42A4-AD04-2D8C5F51ECA4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApiDocumentationWebApplication", "WebApiDocumentationWebApplication\WebApiDocumentationWebApplication.csproj", "{E873D3CC-9FBF-4E5A-A854-2F3A423A4E76}"
+	ProjectSection(ProjectDependencies) = postProject
+		{31137267-7E56-42A4-AD04-2D8C5F51ECA4} = {31137267-7E56-42A4-AD04-2D8C5F51ECA4}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordDocumentGenerator", "WordDocumentGenerator\WordDocumentGenerator.csproj", "{D3AF45AE-E3E4-4810-AE0E-AE411A101A26}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{31137267-7E56-42A4-AD04-2D8C5F51ECA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31137267-7E56-42A4-AD04-2D8C5F51ECA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31137267-7E56-42A4-AD04-2D8C5F51ECA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31137267-7E56-42A4-AD04-2D8C5F51ECA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E873D3CC-9FBF-4E5A-A854-2F3A423A4E76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E873D3CC-9FBF-4E5A-A854-2F3A423A4E76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E873D3CC-9FBF-4E5A-A854-2F3A423A4E76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E873D3CC-9FBF-4E5A-A854-2F3A423A4E76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3AF45AE-E3E4-4810-AE0E-AE411A101A26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3AF45AE-E3E4-4810-AE0E-AE411A101A26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3AF45AE-E3E4-4810-AE0E-AE411A101A26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3AF45AE-E3E4-4810-AE0E-AE411A101A26}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {43650898-3E06-41F2-80EC-F627F2E8E914}
+	EndGlobalSection
+EndGlobal

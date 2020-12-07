@@ -1,0 +1,12 @@
+﻿@model BaseViewModel
+
+@{
+    ViewBag.Title = "Search Result";
+}
+
+<div class="container">
+    @{
+        await Html.RenderPartialAsync("_WebApiTitle", Model);
+        await Html.RenderPartialAsync("_Operations", Model);
+    }
+</div>

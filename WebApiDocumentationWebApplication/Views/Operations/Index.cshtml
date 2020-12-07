@@ -1,0 +1,12 @@
+﻿@model BaseViewModel
+
+@{
+    ViewData["Title"] = "Operations";
+}
+
+<div class="container">
+    @{
+        await Html.RenderPartialAsync("_WebApiTitle", Model);
+        await Html.RenderPartialAsync("_Operations", Model);
+    }
+</div>
